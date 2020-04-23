@@ -47,3 +47,25 @@ func (n *Nimbus) SetBorder(c int) {
 func (n *Nimbus) PlonkChar(c, x, y, colour int) {
 	n.drawChar(n.paper, c, x, y, colour)
 }
+
+// Plot draws a string of characters on the paper at a given location
+// with the colour and size of your choice
+func (n *Nimbus) Plot(text string, x, y, xsize, ysize, colour int) {
+	// Validate colour
+	n.validateColour(colour)
+	// Create a new image big enough to contain the plotted chars
+	// (without scaling)
+	img, _ := ebiten.NewImage(len(text)*10, 10, ebiten.FilterDefault)
+	// draw chars on the image
+	xpos := 0
+	for _, c := range text {
+		n.drawChar(img, int(c), xpos, 0, colour)
+		xpos += 8
+	}
+	// Scale img and draw on paper
+	ex, ey := n.convertPos(x, y, 10)
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(float64(xsize), float64(ysize))
+	op.GeoM.Translate(ex, ey)
+	n.paper.DrawImage(img, op)
+}

@@ -45,10 +45,11 @@ func (n *Nimbus) Init() {
 func (n *Nimbus) Update() {
 
 	// calculate y scale for paper and apply scaling
-	_, paperY := n.paper.Size()
+	paperX, paperY := n.paper.Size()
+	scaleX := 640.0 / float64(paperX)
 	scaleY := 500.0 / float64(paperY)
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(1, scaleY)
+	op.GeoM.Scale(scaleX, scaleY)
 	scaledPaper, _ := ebiten.NewImage(640, 500, ebiten.FilterDefault)
 	scaledPaper.DrawImage(n.paper, op)
 
@@ -109,6 +110,9 @@ func (n *Nimbus) convertColour(c int) color.RGBA {
 // image for any given ASCII code.  If control char is received, a blank char
 // is returned instead.
 func (n *Nimbus) charImageSelecta(c int) *ebiten.Image {
+	// Copy the charset image
+	img, _ := ebiten.NewImageFromImage(n.charsetZeroImage, ebiten.FilterDefault)
+
 	// select blank char 127 if control char
 	if c < 33 {
 		c = 127
@@ -126,21 +130,18 @@ func (n *Nimbus) charImageSelecta(c int) *ebiten.Image {
 	y2 := y1 + 10
 
 	// Return pointer to sub image
-	return n.charsetZeroImage.SubImage(image.Rect(x1, y1, x2, y2)).(*ebiten.Image)
+	return img.SubImage(image.Rect(x1, y1, x2, y2)).(*ebiten.Image)
 }
 
 // drawChar draws a character at a specific location on an image
 func (n *Nimbus) drawChar(image *ebiten.Image, c, x, y, colour int) {
-	// Convert position
-	ex, ey := n.convertPos(x, y, 10)
-	// Draw char on paper
+	// Draw char on image and apply colour
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(ex, ey)
-	// Apply colour
+	op.GeoM.Translate(float64(x), float64(y))
 	rgba := n.convertColour(colour)
-	r := float64(rgba.R)
-	g := float64(rgba.G)
-	b := float64(rgba.B)
+	r := float64(rgba.R) / 0xff
+	g := float64(rgba.G) / 0xff
+	b := float64(rgba.B) / 0xff
 	op.ColorM.Translate(r, g, b, 0)
 	image.DrawImage(n.charImageSelecta(c), op)
 }
