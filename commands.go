@@ -209,6 +209,12 @@ func (n *Nimbus) Put(c int) {
 	ex -= 8
 	ey -= 10
 
+	// Draw paper under the char
+	img, _ := ebiten.NewImage(8, 10, ebiten.FilterDefault)
+	img.Fill(n.convertColour(n.paperColour))
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(ex, ey)
+	n.paper.DrawImage(img, op)
 	// Draw the char
 	n.drawChar(n.paper, c, int(ex), int(ey), n.penColour)
 	// Update relative cursor position
@@ -219,8 +225,8 @@ func (n *Nimbus) Put(c int) {
 		relCurPos.col = 1
 		relCurPos.row++
 	}
-	// New line?
-	if relCurPos.row > height+1 || c == 10 {
+	// Line feed?
+	if relCurPos.row > height+1 {
 		// move cursor up and scroll textbox
 		relCurPos.row--
 		// Scroll up.  First make a temp image the same size as the textbox
@@ -235,7 +241,7 @@ func (n *Nimbus) Put(c int) {
 		oldTextBoxImg := n.paper.SubImage(image.Rect(int(x1), int(y1), int(x2), int(y2))).(*ebiten.Image)
 		newTextBoxImg, _ := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
 		newTextBoxImg.Fill(n.convertColour(n.paperColour))
-		op := &ebiten.DrawImageOptions{}
+		op = &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(0, -10)
 		newTextBoxImg.DrawImage(oldTextBoxImg, op)
 		op = &ebiten.DrawImageOptions{}
@@ -251,7 +257,6 @@ func (n *Nimbus) Print(text string) {
 	for _, c := range text {
 		n.Put(int(c))
 	}
-	// Send carriage return and linefeed
-	n.Put(10)
+	// Send carriage return
 	n.Put(13)
 }
