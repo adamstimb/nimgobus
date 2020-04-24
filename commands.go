@@ -142,20 +142,24 @@ func (n *Nimbus) Cls(p ...int) {
 		// invalid
 		panic("Cls accepts either 0 or 1 parameters")
 	}
+	var box textBox
 	if len(p) == 0 {
 		// No parameters passed so clear currently selected textbox
-		box := n.textBoxes[n.selectedTextBox]
-		// Define bounding rectangle for the textbox
-		x1, y1 := n.convertColRow(colRow{box.col1, box.row1})
-		x2, y2 := n.convertColRow(colRow{box.col2, box.row2})
-		x2 += 8
-		y2 += 10
-		// Create temp image and fill it with paper colour, then paste on the
-		// paper
-		img, _ := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
-		img.Fill(n.convertColour(n.paperColour))
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(x1, y1)
-		n.paper.DrawImage(img, op)
+		box = n.textBoxes[n.selectedTextBox]
+	} else {
+		// One parameter passed so chose another textbox
+		box = n.textBoxes[p[0]]
 	}
+	// Define bounding rectangle for the textbox
+	x1, y1 := n.convertColRow(colRow{box.col1, box.row1})
+	x2, y2 := n.convertColRow(colRow{box.col2, box.row2})
+	x2 += 8
+	y2 += 10
+	// Create temp image and fill it with paper colour, then paste on the
+	// paper
+	img, _ := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
+	img.Fill(n.convertColour(n.paperColour))
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(x1, y1)
+	n.paper.DrawImage(img, op)
 }
