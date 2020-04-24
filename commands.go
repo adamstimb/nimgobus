@@ -3,6 +3,8 @@ package nimgobus
 import (
 	"image"
 
+	"github.com/hajimehoshi/ebiten/ebitenutil"
+
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -271,4 +273,18 @@ func (n *Nimbus) SetColour(paletteSlot, basicColour int) {
 	n.validateColour(paletteSlot)
 	// Validation passed, assign colour
 	n.palette[paletteSlot] = basicColour
+}
+
+// Line draws connected lines on the screen.  The first n pairs of parameters are
+// co-ordinates, and the final parameter is the brush colour.
+func (n *Nimbus) Line(p ...int) {
+	// Extract colour
+	colour := p[len(p)-1]
+	// Extract co-ordinates and draw lines
+	p = p[:len(p)-1]
+	for i := 0; i < len(p)-2; i += 2 {
+		x1, y1 := n.convertPos(p[i], p[i+1], 0)
+		x2, y2 := n.convertPos(p[i+2], p[i+3], 0)
+		ebitenutil.DrawLine(n.paper, x1, y1, x2, y2, n.convertColour(colour))
+	}
 }
