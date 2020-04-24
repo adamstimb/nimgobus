@@ -33,6 +33,7 @@ type Nimbus struct {
 	borderSize            int
 	borderColour          int
 	paperColour           int
+	penColour             int
 	defaultHighResPalette []int
 	defaultLowResPalette  []int
 	palette               []int
@@ -56,6 +57,7 @@ func (n *Nimbus) Init() {
 	n.palette = defaultHighResPalette
 	n.borderColour = 0
 	n.paperColour = 0
+	n.penColour = 3
 	n.cursorPosition = colRow{1, 1}
 	n.selectedTextBox = 0
 	// Initialize with mode 80 textboxes

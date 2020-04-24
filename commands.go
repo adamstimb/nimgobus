@@ -164,3 +164,38 @@ func (n *Nimbus) Cls(p ...int) {
 	op.GeoM.Translate(x1, y1)
 	n.paper.DrawImage(img, op)
 }
+
+// SetCurpos sets the cursor position within the selected text box
+func (n *Nimbus) SetCurpos(col, row int) {
+	// Pick the textbox
+	box := n.textBoxes[n.selectedTextBox]
+	// Validate col and row position
+	if col < 0 || row < 0 {
+		panic("Negative column or row values are not allowed")
+	}
+	width := box.col2 - box.col1
+	height := box.row2 - box.row1
+	if col > width {
+		panic("Column value is outside selected textbox")
+	}
+	if row > height {
+		panic("Row value is outside selected textbox")
+	}
+	// Validation passed, set cursor position
+	n.cursorPosition = colRow{col, row}
+}
+
+// SetPen sets the pen colour
+func (n *Nimbus) SetPen(c int) {
+	n.validateColour(c)
+	n.penColour = c
+}
+
+// Put plots an ASCII char at the cursor position
+func (n *Nimbus) Put(c int) {
+	// todo: validate c
+	// Get x, y coordinate of cursor and draw the char
+	ex, ey := n.convertColRow(n.cursorPosition)
+	// Draw the char
+	n.drawChar(n.paper, c, int(ex), int(ey), n.penColour)
+}
