@@ -69,3 +69,15 @@ func (n *Nimbus) Plot(text string, x, y, xsize, ysize, colour int) {
 	op.GeoM.Translate(ex, ey)
 	n.paper.DrawImage(img, op)
 }
+
+// Mode returns the current screen mode (40 column or 80 column)
+func (n *Nimbus) Mode() int {
+	width, _ := n.paper.Size()
+	if width == 320 {
+		return 40 // low-res mode 40
+	}
+	if width == 640 {
+		return 80 // high-res mode 80
+	}
+	return 0 // this never happens
+}
