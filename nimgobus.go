@@ -11,6 +11,14 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+// textBox defines the bounding box of a scrollable text box
+type textBox struct {
+	col1 int
+	row1 int
+	col2 int
+	row2 int
+}
+
 // Nimbus acts as a container for all the components of the monitor
 type Nimbus struct {
 	Monitor               *ebiten.Image
@@ -24,6 +32,8 @@ type Nimbus struct {
 	palette               []int
 	logoImage             *ebiten.Image
 	charsetZeroImage      *ebiten.Image
+	textBoxes             [10]textBox
+	selectedTextBox       int
 }
 
 // Init initializes a new Nimbus
@@ -39,6 +49,11 @@ func (n *Nimbus) Init() {
 	n.palette = defaultHighResPalette
 	n.borderColour = 0
 	n.paperColour = 0
+	n.selectedTextBox = 0
+	// Initialize with mode 80 textboxes
+	for i := 0; i < 10; i++ {
+		n.textBoxes[i] = textBox{1, 1, 25, 80}
+	}
 }
 
 // Update draws the monitor image
