@@ -23,6 +23,10 @@ func (n *Nimbus) SetMode(columns int) {
 		n.palette = n.defaultHighResPalette
 	}
 	n.paper.Fill(n.convertColour(n.paperColour)) // Apply paper colour
+	// Redefine textboxes
+	for i := 0; i < 10; i++ {
+		n.textBoxes[i] = textBox{1, 1, 25, columns}
+	}
 }
 
 // PlonkLogo draws the RM Nimbus logo with bottom left-hand corner at (x, y)
@@ -68,4 +72,56 @@ func (n *Nimbus) Plot(text string, x, y, xsize, ysize, colour int) {
 	op.GeoM.Scale(float64(xsize), float64(ysize))
 	op.GeoM.Translate(ex, ey)
 	n.paper.DrawImage(img, op)
+}
+
+// Mode returns the current screen mode (40 column or 80 column)
+func (n *Nimbus) Mode() int {
+	width, _ := n.paper.Size()
+	if width == 320 {
+		return 40 // low-res mode 40
+	}
+	if width == 640 {
+		return 80 // high-res mode 80
+	}
+	return 0 // this never happens
+}
+
+// SetWriting selects a textbox if only 1 parameter is passed (index), or
+// defines a textbox if 5 parameters are passed (index, col1, row1, col2,
+// row2)
+func (n *Nimbus) SetWriting(p ...int) {
+	// Validate number of parameters
+	if len(p) != 1 && len(p) != 5 {
+		// invalid
+		panic("SetWriting accepts either 1 or 5 parameters")
+	}
+	if len(p) == 1 {
+		// Select textbox - validate choice first then set it
+		// and return
+		if p[0] < 0 || p[0] > 9 {
+			panic("SetWriting index out of range")
+		}
+		n.selectedTextBox = p[0]
+		return
+	}
+	// Otherwise define textbox if index is not 0
+	if p[0] == 0 {
+		panic("SetWriting cannot define index zero")
+	}
+	// Validate column and row values
+	for i := 1; i < 10; i++ {
+		if p[i] < 0 {
+			panic("Negative row or column values are not allowed")
+		}
+	}
+	if p[2] > 25 || p[4] > 25 {
+		panic("Row values above 25 are not allowed")
+	}
+	maxColumns := n.Mode()
+	if p[1] > maxColumns || p[3] > maxColumns {
+		panic("Column value out of range for this screen mode")
+	}
+	// Validate passed - set the textbox
+	n.textBoxes[p[0]] = textBox{p[1], p[2], p[3], p[4]}
+	return
 }
