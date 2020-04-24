@@ -261,3 +261,14 @@ func (n *Nimbus) Print(text string) {
 	// Send carriage return
 	n.Put(13)
 }
+
+// SetColour assigns one of the basic colours to a slot in the current palette
+func (n *Nimbus) SetColour(paletteSlot, basicColour int) {
+	// Validate basicColour and paletteSlot
+	if basicColour < 0 || basicColour > 16 {
+		panic("basicColour is out of range")
+	}
+	n.validateColour(paletteSlot)
+	// Validation passed, assign colour
+	n.palette[paletteSlot] = basicColour
+}
