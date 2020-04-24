@@ -229,9 +229,7 @@ func (n *Nimbus) Put(c int) {
 	if relCurPos.row > height+1 {
 		// move cursor up and scroll textbox
 		relCurPos.row--
-		// Scroll up.  First make a temp image the same size as the textbox
-		// and fill it in the paper colour.  Then cut out the actual textbox
-		// and draw it on the temp image 10 pixels higher.
+		// Scroll up:
 		// Define bounding rectangle for the textbox
 		x1, y1 := n.convertColRow(colRow{box.col1, box.row1})
 		x2, y2 := n.convertColRow(colRow{box.col2, box.row2})
@@ -239,11 +237,14 @@ func (n *Nimbus) Put(c int) {
 		y2 += 10
 		// Copy actual textbox image
 		oldTextBoxImg := n.paper.SubImage(image.Rect(int(x1), int(y1), int(x2), int(y2))).(*ebiten.Image)
+		// Create a new textbox image and fill it with paper colour
 		newTextBoxImg, _ := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
 		newTextBoxImg.Fill(n.convertColour(n.paperColour))
+		// Place old textbox image on new image 10 pixels higher
 		op = &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(0, -10)
 		newTextBoxImg.DrawImage(oldTextBoxImg, op)
+		// Redraw the textbox on the paper
 		op = &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(x1, y1)
 		n.paper.DrawImage(newTextBoxImg, op)
