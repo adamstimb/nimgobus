@@ -11,6 +11,12 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+// cuolRow defines a column, row position
+type colRow struct {
+	col int
+	row int
+}
+
 // textBox defines the bounding box of a scrollable text box
 type textBox struct {
 	col1 int
@@ -34,6 +40,7 @@ type Nimbus struct {
 	charsetZeroImage      *ebiten.Image
 	textBoxes             [10]textBox
 	selectedTextBox       int
+	cursorPosition        colRow
 }
 
 // Init initializes a new Nimbus
@@ -49,6 +56,7 @@ func (n *Nimbus) Init() {
 	n.palette = defaultHighResPalette
 	n.borderColour = 0
 	n.paperColour = 0
+	n.cursorPosition = colRow{1, 1}
 	n.selectedTextBox = 0
 	// Initialize with mode 80 textboxes
 	for i := 0; i < 10; i++ {
@@ -102,6 +110,14 @@ func (n *Nimbus) loadCharsetImages() {
 func (n *Nimbus) convertPos(x, y, imageHeight int) (ex, ey float64) {
 	_, paperHeight := n.paper.Size()
 	return float64(x), float64(paperHeight) - float64(y) - float64(imageHeight)
+}
+
+// convertColRow receives a Nimbus-style column, row position and returns an
+// ebiten-style graphical coordinate
+func (n *Nimbus) convertColRow(cr colRow) (ex, ey float64) {
+	ex = (float64(cr.col) * 8) - 8
+	ey = (float64(cr.row) * 10) - 10
+	return ex, ey
 }
 
 // validateColour checks that a Nimbus colour index is valid for the current

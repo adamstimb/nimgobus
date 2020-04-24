@@ -22,11 +22,13 @@ func (n *Nimbus) SetMode(columns int) {
 		n.paper, _ = ebiten.NewImage(640, 250, ebiten.FilterDefault)
 		n.palette = n.defaultHighResPalette
 	}
+	n.cursorPosition = colRow{1, 1}              // Relocate cursor
 	n.paper.Fill(n.convertColour(n.paperColour)) // Apply paper colour
-	// Redefine textboxes
+	// Redefine textboxes and clear screen
 	for i := 0; i < 10; i++ {
-		n.textBoxes[i] = textBox{1, 1, 25, columns}
+		n.textBoxes[i] = textBox{1, 1, columns, 25}
 	}
+	n.Cls()
 }
 
 // PlonkLogo draws the RM Nimbus logo with bottom left-hand corner at (x, y)
@@ -109,7 +111,7 @@ func (n *Nimbus) SetWriting(p ...int) {
 		panic("SetWriting cannot define index zero")
 	}
 	// Validate column and row values
-	for i := 1; i < 10; i++ {
+	for i := 1; i < 5; i++ {
 		if p[i] < 0 {
 			panic("Negative row or column values are not allowed")
 		}
@@ -124,4 +126,41 @@ func (n *Nimbus) SetWriting(p ...int) {
 	// Validate passed - set the textbox
 	n.textBoxes[p[0]] = textBox{p[1], p[2], p[3], p[4]}
 	return
+}
+
+// SetPaper sets the paper colour
+func (n *Nimbus) SetPaper(c int) {
+	n.validateColour(c)
+	n.paperColour = c
+}
+
+// Cls clears the selected textbox if no parameters are passed, or clears another
+// textbox if one parameter is passed
+func (n *Nimbus) Cls(p ...int) {
+	// Validate number of parameters
+	if len(p) != 0 && len(p) != 1 {
+		// invalid
+		panic("Cls accepts either 0 or 1 parameters")
+	}
+	// Pick the textbox
+	var box textBox
+	if len(p) == 0 {
+		// No parameters passed so clear currently selected textbox
+		box = n.textBoxes[n.selectedTextBox]
+	} else {
+		// One parameter passed so chose another textbox
+		box = n.textBoxes[p[0]]
+	}
+	// Define bounding rectangle for the textbox
+	x1, y1 := n.convertColRow(colRow{box.col1, box.row1})
+	x2, y2 := n.convertColRow(colRow{box.col2, box.row2})
+	x2 += 8
+	y2 += 10
+	// Create temp image and fill it with paper colour, then paste on the
+	// paper
+	img, _ := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
+	img.Fill(n.convertColour(n.paperColour))
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(x1, y1)
+	n.paper.DrawImage(img, op)
 }
