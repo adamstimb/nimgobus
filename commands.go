@@ -111,7 +111,7 @@ func (n *Nimbus) SetWriting(p ...int) {
 		panic("SetWriting cannot define index zero")
 	}
 	// Validate column and row values
-	for i := 1; i < 10; i++ {
+	for i := 1; i < 5; i++ {
 		if p[i] < 0 {
 			panic("Negative row or column values are not allowed")
 		}
@@ -142,6 +142,7 @@ func (n *Nimbus) Cls(p ...int) {
 		// invalid
 		panic("Cls accepts either 0 or 1 parameters")
 	}
+	// Pick the textbox
 	var box textBox
 	if len(p) == 0 {
 		// No parameters passed so clear currently selected textbox
