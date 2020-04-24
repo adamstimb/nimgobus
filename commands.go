@@ -1,7 +1,7 @@
 package nimgobus
 
 import (
-	"fmt"
+	"image"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -208,23 +208,39 @@ func (n *Nimbus) Put(c int) {
 	ex, ey := n.convertColRow(absCurPos)
 	ex -= 8
 	ey -= 10
-	fmt.Println(ex, ey)
 
 	// Draw the char
 	n.drawChar(n.paper, c, int(ex), int(ey), n.penColour)
 	// Update relative cursor position
 	relCurPos.col++
 	// Carriage return?
-	if relCurPos.col > width+1 {
+	if relCurPos.col > width+1 || c == 13 {
 		// over the edge so carriage return
 		relCurPos.col = 1
 		relCurPos.row++
 	}
-	// Scroll up?
-	if relCurPos.row > height+1 {
+	// New line?
+	if relCurPos.row > height+1 || c == 10 {
 		// move cursor up and scroll textbox
 		relCurPos.row--
-		// scroll
+		// Scroll up.  First make a temp image the same size as the textbox
+		// and fill it in the paper colour.  Then cut out the actual textbox
+		// and draw it on the temp image 10 pixels higher.
+		// Define bounding rectangle for the textbox
+		x1, y1 := n.convertColRow(colRow{box.col1, box.row1})
+		x2, y2 := n.convertColRow(colRow{box.col2, box.row2})
+		x2 += 8
+		y2 += 10
+		// Copy actual textbox image
+		oldTextBoxImg := n.paper.SubImage(image.Rect(int(x1), int(y1), int(x2), int(y2))).(*ebiten.Image)
+		newTextBoxImg, _ := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
+		newTextBoxImg.Fill(n.convertColour(n.paperColour))
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(0, -10)
+		newTextBoxImg.DrawImage(oldTextBoxImg, op)
+		op = &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(x1, y1)
+		n.paper.DrawImage(newTextBoxImg, op)
 	}
 	// Set new cursor position
 	n.cursorPosition = relCurPos
@@ -235,4 +251,7 @@ func (n *Nimbus) Print(text string) {
 	for _, c := range text {
 		n.Put(int(c))
 	}
+	// Send carriage return and linefeed
+	n.Put(10)
+	n.Put(13)
 }
