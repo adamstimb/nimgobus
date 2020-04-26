@@ -6,7 +6,9 @@ Disclaimer: Nimgobus is a tribute project and is in no way linked to or endorsed
 
 ## Example
 
-This is a minimal example that draws a Nimbus screen with a greeting and scales it to the ebiten screen size.
+This is a minimal example that draws a Nimbus screen with a greeting, the Nimbus BIOS logo with the paper and border in different shades of blue.  The Nimbus screen is also scaled to the ebiten screen size while maintaining the original aspect ratio.  Most of the code is for setting up and running an ebiten game and scaling the screen.  The function Example() contains the magic 1980s 16-bit sauce.
+
+![example](example.png)
 
 ```go
 package main
@@ -19,12 +21,13 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+// Ebiten screen dimensions
 const (
 	screenWidth  = 1200
 	screenHeight = 800
 )
 
-// Declare a global Nimbus
+// Declare a global Nimbus variable
 var (
 	nim nimgobus.Nimbus
 )
@@ -33,35 +36,35 @@ type Game struct {
 	count int
 }
 
-func Example() {
-	// Draw some stuff on the Nimbus
-	nim.SetMode(40)
-	nim.SetBorder(10)
-	nim.SetPaper(1)
-	nim.Cls()
-	nim.PlonkLogo(1, 1)
-	nim.Plot("Nim  bus", 49, 149, 3, 3, 9)
-	nim.Plot("   go", 49, 149, 3, 3, 13)
-}
-
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }
 
 func (g *Game) Update(screen *ebiten.Image) error {
-    // Only draw the Nimbus screen once
-    if g.count == 0 {
-		go Test() 
+	if g.count == 0 {
+		go Example() // Only draw the Nimbus screen once
 	}
-    g.count++
-    // Update the Nimbus screen on each frame
-	nim.Update() 
+	g.count++
+	nim.Update() // Redraw the Nimbus screen
 	return nil
+}
+
+func Example() {
+	// Do some Nimbus graphics
+	nim.SetMode(40)  // Low-res, high-colour mode
+	nim.SetBorder(9) // Light blue border
+	nim.SetPaper(1)  // Dark blue paper
+	nim.Cls()        // Clear screen
+	// Plot some text with a shadow effect
+	nim.Plot("Nimgobus", 65, 150, 3, 6, 0)
+	nim.Plot("Nimgobus", 67, 152, 3, 6, 14)
+	nim.Plot("it ain't no real", 100, 70, 1, 1, 13)
+	nim.PlonkLogo(8, 8) // Draw the Nimbus BIOS logo
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
-	// Draw the Nimbus monitor on the screen and scale to current ebiten screen size.
+	// Draw the Nimbus monitor on the screen and scale to current window size.
 	monitorWidth, monitorHeight := nim.Monitor.Size()
 	// Calculate aspect ratios of Nimbus monitor and ebiten screen
 	monitorRatio := float64(monitorWidth) / float64(monitorHeight)
@@ -79,7 +82,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		offsetX = 0
 		offsetY = (float64(screenHeight) - float64(monitorHeight)*scale) / 2
 	}
-
 	// Apply scale and centre monitor on screen
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(scale, scale)
@@ -90,14 +92,17 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func main() {
 
-	// Initialize the new Nimbus
+	// Initialize a new Nimbus
 	nim.Init()
+
 	// set up window
 	ebiten.SetWindowSize(screenWidth, screenHeight)
-	ebiten.SetWindowTitle("Nimgobus Test")
-	// Call RunGame
+	ebiten.SetWindowTitle("Nimgobus Example")
+
+	// Call RunGame method, passing the address of the pointer to an empty Game struct
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
 }
+
 ```

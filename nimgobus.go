@@ -34,15 +34,15 @@ type Nimbus struct {
 	borderColour          int
 	paperColour           int
 	penColour             int
+	charset               int
 	defaultHighResPalette []int
 	defaultLowResPalette  []int
 	palette               []int
 	logoImage             *ebiten.Image
-	charsetZeroImage      *ebiten.Image
 	textBoxes             [10]textBox
 	selectedTextBox       int
 	cursorPosition        colRow
-	charsetZeroImages     [256]*ebiten.Image
+	charImages0           [256]*ebiten.Image
 }
 
 // Init initializes a new Nimbus
@@ -59,6 +59,7 @@ func (n *Nimbus) Init() {
 	n.borderColour = 0
 	n.paperColour = 0
 	n.penColour = 3
+	n.charset = 0
 	n.cursorPosition = colRow{1, 1}
 	n.selectedTextBox = 0
 	// Initialize with mode 80 textboxes
@@ -108,7 +109,7 @@ func (n *Nimbus) loadCharsetImages() {
 	}
 	img2, _ := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 	for i := 0; i <= 255; i++ {
-		n.charsetZeroImages[i] = n.charImageSelecta(img2, i)
+		n.charImages0[i] = n.charImageSelecta(img2, i)
 	}
 }
 
@@ -148,9 +149,6 @@ func (n *Nimbus) convertColour(c int) color.RGBA {
 // is returned instead.
 func (n *Nimbus) charImageSelecta(img *ebiten.Image, c int) *ebiten.Image {
 
-	// Copy the charset image
-	//img, _ := ebiten.NewImageFromImage(n.charsetZeroImage, ebiten.FilterDefault)
-
 	// select blank char 127 if control char
 	if c < 33 {
 		c = 127
@@ -181,5 +179,5 @@ func (n *Nimbus) drawChar(image *ebiten.Image, c, x, y, colour int) {
 	g := float64(rgba.G) / 0xff
 	b := float64(rgba.B) / 0xff
 	op.ColorM.Translate(r, g, b, 0)
-	image.DrawImage(n.charsetZeroImages[c], op)
+	image.DrawImage(n.charImages0[c], op)
 }
