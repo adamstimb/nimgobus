@@ -194,7 +194,7 @@ func (n *Nimbus) SetPen(c int) {
 	n.penColour = c
 }
 
-// Put plots an ASCII char at the cursor position
+// Put draws an ASCII char at the cursor position
 func (n *Nimbus) Put(c int) {
 	// todo: validate c
 	// Pick the textbox
