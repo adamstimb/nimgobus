@@ -3,8 +3,7 @@ package nimgobus
 import (
 	"image"
 
-	"github.com/hajimehoshi/ebiten/ebitenutil"
-
+	"github.com/StephaneBunel/bresenham"
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -280,11 +279,25 @@ func (n *Nimbus) SetColour(paletteSlot, basicColour int) {
 func (n *Nimbus) Line(p ...int) {
 	// Extract colour
 	colour := p[len(p)-1]
-	// Extract co-ordinates and draw lines
+	// Remove colour parameter
 	p = p[:len(p)-1]
+	// Use drawLine to draw connected lines
 	for i := 0; i < len(p)-2; i += 2 {
-		x1, y1 := n.convertPos(p[i], p[i+1], 0)
-		x2, y2 := n.convertPos(p[i+2], p[i+3], 0)
-		ebitenutil.DrawLine(n.paper, x1, y1, x2, y2, n.convertColour(colour))
+		n.drawLine(p[i], p[i+1], p[i+2], p[i+3], colour)
 	}
+}
+
+// drawLine uses the Bresenham algorithm to draw a straight line on the Nimbus paper
+func (n *Nimbus) drawLine(x1, y1, x2, y2, colour int) {
+	// convert coordinates
+	ex1, ey1 := n.convertPos(x1, y1, 1)
+	ex2, ey2 := n.convertPos(x2, y2, 1)
+	// create a temp image on which to draw the line
+	paperWidth, paperHeight := n.paper.Size()
+	dest := image.NewRGBA(image.Rect(0, 0, paperWidth, paperHeight))
+	bresenham.Bresenham(dest, int(ex1), int(ey1), int(ex2), int(ey2), n.convertColour(colour))
+	// create a copy of the image as an ebiten.image and paste it on to the Nimbus paper
+	img, _ := ebiten.NewImageFromImage(dest, ebiten.FilterDefault)
+	op := &ebiten.DrawImageOptions{}
+	n.paper.DrawImage(img, op)
 }
