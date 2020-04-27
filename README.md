@@ -2,7 +2,25 @@
 
 An [Ebiten](https://ebiten.org/) extension for creating Go applications with an RM Nimbus look and feel.
 
-Disclaimer: Nimgobus is a tribute project and is in no way linked to or endorsed by RM plc.
+## About
+
+Nimgobus is a graphical user-interface package for Go that mimicks the graphics and text drivers of the RM Nimbus PC186.  It is _not_ an emulation of the Nimbus itself.  
+
+As an extension of the 'dead simple' (and nonetheless excellent) [Ebiten](https://ebiten.org/) game engine for Go you get the both worlds:
+
+- Cutting-edge Go computing power, beautifully presented in up to 16 colours
+- Compiled and executed on major platforms: Linux, macOS, Windows and even on the web via WebASM!
+- Embed a Nimbus as a component within another user interface (if you really want to go nuts)
+
+_Disclaimer: Nimgobus is a tribute project and is in no way linked to or endorsed by RM plc._
+
+## Installation
+
+[Install Ebiten](https://ebiten.org/documents/install.html) then simply get the Nimgobus extension:
+
+```bash
+$ go get github.com/adamstimb/nimgobus
+```
 
 ## Example
 
@@ -106,3 +124,16 @@ func main() {
 }
 
 ```
+
+## Links
+
+- IT teacher gopher by [gopherize.me](https://gopherize.me/)
+- [Facebook](https://www.facebook.com/RMNimbus/) - RM Nimbus facebook group
+- [Center for Computing History](http://www.computinghistory.org.uk/) - original RM Nimbus manuals and technical data
+- [Center for Computing History - RM Nimbus PC (Later Beige Model)](http://www.computinghistory.org.uk/det/41537/RM-Nimbus-PC-(Later-Beige-Model)/) - online exhibit
+- [The Nimbus Museum](https://thenimbus.co.uk/) - online museum that looks like the Welcome Disk!
+- [RM Nimbus](https://en.wikipedia.org/wiki/RM_Nimbus) - Wikipedia article
+- [mame](https://www.mamedev.org/) - comprehensive retro computer emulation project
+- [Freesound pack: Floppy disk drive](https://freesound.org/people/MrAuralization/packs/15891/) - source of the floppy drive sounds
+- [Nimusinator](https://github.com/adamstimb/nimbusinator) - similar package for Python and predecessor to Nimgobus
+- [Ironstone Innovation](https://ironstoneinnovation.eu) - what I do for a living
