@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"log"
 	"math"
+	"time"
 
 	"github.com/adamstimb/nimgobus/images"
 	"github.com/hajimehoshi/ebiten"
@@ -35,6 +36,7 @@ type Nimbus struct {
 	paperColour           int
 	penColour             int
 	charset               int
+	cursorChar            int
 	defaultHighResPalette []int
 	defaultLowResPalette  []int
 	palette               []int
@@ -42,6 +44,7 @@ type Nimbus struct {
 	textBoxes             [10]textBox
 	selectedTextBox       int
 	cursorPosition        colRow
+	cursorFlash           bool
 	charImages0           [256]*ebiten.Image
 	charImages1           [256]*ebiten.Image
 }
@@ -62,25 +65,47 @@ func (n *Nimbus) Init() {
 	n.paperColour = 0
 	n.penColour = 3
 	n.charset = 0
+	n.cursorChar = 95
 	n.cursorPosition = colRow{1, 1}
+	n.cursorFlash = true
 	n.selectedTextBox = 0
 	// Initialize with mode 80 textboxes
 	for i := 0; i < 10; i++ {
 		n.textBoxes[i] = textBox{1, 1, 25, 80}
+	}
+	// Start flashCursor
+	go n.flashCursor()
+}
+
+// flashCursor flips the cursorFlash flag every half second
+func (n *Nimbus) flashCursor() {
+	for {
+		time.Sleep(500 * time.Millisecond)
+		n.cursorFlash = !n.cursorFlash
 	}
 }
 
 // Update draws the monitor image
 func (n *Nimbus) Update() {
 
+	// Copy paper so we can apply overlays (e.g. cursor)
+	paperCopy, _ := ebiten.NewImageFromImage(n.paper, ebiten.FilterDefault)
+
+	// Apply overlays
+	// Cursor
+	if n.cursorFlash {
+		curX, curY := n.convertColRow(n.cursorPosition)
+		n.drawChar(paperCopy, n.cursorChar, int(curX), int(curY), n.penColour, n.charset)
+	}
+
 	// calculate y scale for paper and apply scaling
-	paperX, paperY := n.paper.Size()
+	paperX, paperY := paperCopy.Size()
 	scaleX := 640.0 / float64(paperX)
 	scaleY := 500.0 / float64(paperY)
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(scaleX, scaleY)
 	scaledPaper, _ := ebiten.NewImage(640, 500, ebiten.FilterDefault)
-	scaledPaper.DrawImage(n.paper, op)
+	scaledPaper.DrawImage(paperCopy, op)
 
 	// Add the border around the paper
 	withBorder, _ := ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2), ebiten.FilterDefault)
