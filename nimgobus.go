@@ -44,6 +44,8 @@ type Nimbus struct {
 	textBoxes             [10]textBox
 	selectedTextBox       int
 	cursorPosition        colRow
+	cursorMode            int
+	cursorCharset         int
 	cursorFlash           bool
 	charImages0           [256]*ebiten.Image
 	charImages1           [256]*ebiten.Image
@@ -65,7 +67,9 @@ func (n *Nimbus) Init() {
 	n.paperColour = 0
 	n.penColour = 3
 	n.charset = 0
+	n.cursorMode = 0
 	n.cursorChar = 95
+	n.cursorCharset = 0
 	n.cursorPosition = colRow{1, 1}
 	n.cursorFlash = true
 	n.selectedTextBox = 0
@@ -81,7 +85,18 @@ func (n *Nimbus) Init() {
 func (n *Nimbus) flashCursor() {
 	for {
 		time.Sleep(500 * time.Millisecond)
-		n.cursorFlash = !n.cursorFlash
+		if n.cursorMode == 0 {
+			// Flashing cursor
+			n.cursorFlash = !n.cursorFlash
+		}
+		if n.cursorMode < 0 {
+			// Invisible cursor
+			n.cursorFlash = false
+		}
+		if n.cursorMode > 1 {
+			// Visible cursor but not flashing
+			n.cursorFlash = true
+		}
 	}
 }
 
@@ -95,7 +110,7 @@ func (n *Nimbus) Update() {
 	// Cursor
 	if n.cursorFlash {
 		curX, curY := n.convertColRow(n.cursorPosition)
-		n.drawChar(paperCopy, n.cursorChar, int(curX), int(curY), n.penColour, n.charset)
+		n.drawChar(paperCopy, n.cursorChar, int(curX), int(curY), n.penColour, n.cursorCharset)
 	}
 
 	// calculate y scale for paper and apply scaling

@@ -18,12 +18,18 @@ func (n *Nimbus) SetMode(columns int) {
 	if columns == 40 {
 		// low-resolution, high-colour mode (320x250)
 		n.paper, _ = ebiten.NewImage(320, 250, ebiten.FilterDefault)
+		n.paperColour = 0
+		n.borderColour = 0
+		n.penColour = 15
 		n.palette = n.defaultLowResPalette
 	}
 	if columns == 80 {
 		// high-resolutions, low-colour mode (640x250)
 		n.paper, _ = ebiten.NewImage(640, 250, ebiten.FilterDefault)
 		n.palette = n.defaultHighResPalette
+		n.paperColour = 0
+		n.borderColour = 0
+		n.penColour = 3
 	}
 	n.cursorPosition = colRow{1, 1}              // Relocate cursor
 	n.paper.Fill(n.convertColour(n.paperColour)) // Apply paper colour
@@ -311,4 +317,34 @@ func (n *Nimbus) drawLine(x1, y1, x2, y2, colour int) {
 	img, _ := ebiten.NewImageFromImage(dest, ebiten.FilterDefault)
 	op := &ebiten.DrawImageOptions{}
 	n.paper.DrawImage(img, op)
+}
+
+// SetCursor changes the cursor state.  Between 1 and 3 parameters can be passed. The
+// first parameter sets the cursor mode (< 0 for invisible cursor, 0 for flashing
+// cursor, > 0 for visible cursor without flashing), the second parameter sets the ASCII
+// code of the cursor char, the third parameter sets the charset of the cursor char.
+func (n *Nimbus) SetCursor(p ...int) {
+	// Validate
+	if len(p) < 1 || len(p) > 3 {
+		panic("SetCursor requires 1 to 3 parameters")
+	}
+	// Set cursor mode
+	n.cursorMode = p[0]
+	// If 2 parameters, set cursor char as well
+	if len(p) > 1 {
+		// Validate char
+		if p[1] < 0 || p[1] > 255 {
+			panic("Invalid cursor char")
+		}
+		// Set it
+		n.cursorChar = p[1]
+	}
+	if len(p) > 2 {
+		// Validate charset
+		if p[2] != 0 && p[2] != 1 {
+			panic("Invalid charset")
+		}
+		// Set it
+		n.cursorCharset = p[2]
+	}
 }
