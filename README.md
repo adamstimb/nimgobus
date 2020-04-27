@@ -4,7 +4,7 @@ An [Ebiten](https://ebiten.org/) extension for building vaporwave apps and games
 
 ## About
 
-Nimgobus is a graphical user-interface package for Go that mimicks the 16-bit graphics and text drivers of the [RM Nimbus PC186](https://en.wikipedia.org/wiki/RM_Nimbus), found in classrooms all over the UK in the 1980s and early 90s.  However, it is _not_ an emulation of the Nimbus itself.  This means you get the best of both worlds:
+Nimgobus is an extension of the excellent [Ebiten](https://ebiten.org/) game engine.  It mimicks the 16-bit graphics and text drivers of the [RM Nimbus PC186](https://en.wikipedia.org/wiki/RM_Nimbus), found in classrooms all over the UK in the 1980s and early 90s.  With Nimgobus you can develop Go applications that have the cheesey and often 'chromatically challenging' look and feel of classic Nimbus software such as PaintSPA, Ourfacts and Caxton Press.  However, it is _not_ an emulation of the Nimbus itself.  This means you get the best of both worlds:
 
 - Cutting-edge Go computing power, beautifully presented in up to 16 colours
 - Compile and execute on Linux, macOS, Windows and even the web via WebASM
