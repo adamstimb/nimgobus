@@ -34,20 +34,23 @@ type Nimbus struct {
 	borderColour          int
 	paperColour           int
 	penColour             int
+	charset               int
 	defaultHighResPalette []int
 	defaultLowResPalette  []int
 	palette               []int
 	logoImage             *ebiten.Image
-	charsetZeroImage      *ebiten.Image
 	textBoxes             [10]textBox
 	selectedTextBox       int
 	cursorPosition        colRow
+	charImages0           [256]*ebiten.Image
+	charImages1           [256]*ebiten.Image
 }
 
 // Init initializes a new Nimbus
 func (n *Nimbus) Init() {
 	n.loadLogoImage()
-	n.loadCharsetImages()
+	n.loadCharsetImages(0)
+	n.loadCharsetImages(1)
 	n.borderSize = 50
 	n.Monitor, _ = ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2), ebiten.FilterDefault)
 	n.paper, _ = ebiten.NewImage(640, 250, ebiten.FilterDefault)
@@ -58,6 +61,7 @@ func (n *Nimbus) Init() {
 	n.borderColour = 0
 	n.paperColour = 0
 	n.penColour = 3
+	n.charset = 0
 	n.cursorPosition = colRow{1, 1}
 	n.selectedTextBox = 0
 	// Initialize with mode 80 textboxes
@@ -100,12 +104,25 @@ func (n *Nimbus) loadLogoImage() {
 }
 
 // loadCharsetImages loads the charset images
-func (n *Nimbus) loadCharsetImages() {
-	img, _, err := image.Decode(bytes.NewReader(images.CharSetZeroImage))
+func (n *Nimbus) loadCharsetImages(charset int) {
+	var img image.Image
+	var err error
+	if charset == 0 {
+		img, _, err = image.Decode(bytes.NewReader(images.CharSetZeroImage))
+	} else {
+		img, _, err = image.Decode(bytes.NewReader(images.CharSetOneImage))
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
-	n.charsetZeroImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	img2, _ := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	for i := 0; i <= 255; i++ {
+		if charset == 0 {
+			n.charImages0[i] = n.charImageSelecta(img2, i)
+		} else {
+			n.charImages1[i] = n.charImageSelecta(img2, i)
+		}
+	}
 }
 
 // convertPos receives Nimbus-style screen coords and returns then as ebiten-style
@@ -142,9 +159,7 @@ func (n *Nimbus) convertColour(c int) color.RGBA {
 // charImageSelecta returns the subimage pointer of a char from the charset
 // image for any given ASCII code.  If control char is received, a blank char
 // is returned instead.
-func (n *Nimbus) charImageSelecta(c int) *ebiten.Image {
-	// Copy the charset image
-	img, _ := ebiten.NewImageFromImage(n.charsetZeroImage, ebiten.FilterDefault)
+func (n *Nimbus) charImageSelecta(img *ebiten.Image, c int) *ebiten.Image {
 
 	// select blank char 127 if control char
 	if c < 33 {
@@ -167,7 +182,7 @@ func (n *Nimbus) charImageSelecta(c int) *ebiten.Image {
 }
 
 // drawChar draws a character at a specific location on an image
-func (n *Nimbus) drawChar(image *ebiten.Image, c, x, y, colour int) {
+func (n *Nimbus) drawChar(image *ebiten.Image, c, x, y, colour, charset int) {
 	// Draw char on image and apply colour
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
@@ -176,5 +191,9 @@ func (n *Nimbus) drawChar(image *ebiten.Image, c, x, y, colour int) {
 	g := float64(rgba.G) / 0xff
 	b := float64(rgba.B) / 0xff
 	op.ColorM.Translate(r, g, b, 0)
-	image.DrawImage(n.charImageSelecta(c), op)
+	if charset == 0 {
+		image.DrawImage(n.charImages0[c], op)
+	} else {
+		image.DrawImage(n.charImages1[c], op)
+	}
 }
