@@ -6,10 +6,10 @@ An [Ebiten](https://ebiten.org/) extension for creating Go applications with an 
 
 Nimgobus is a graphical user-interface package for Go that mimicks the graphics and text drivers of the RM Nimbus PC186.  It is _not_ an emulation of the Nimbus itself.  
 
-As an extension of the 'dead simple' (and nonetheless excellent) [Ebiten](https://ebiten.org/) game engine for Go you get the both worlds:
+As an extension of the 'dead simple' (and nonetheless excellent) [Ebiten](https://ebiten.org/) game engine for Go you get the best of both worlds:
 
 - Cutting-edge Go computing power, beautifully presented in up to 16 colours
-- Compiled and executed on major platforms: Linux, macOS, Windows and even on the web via WebASM!
+- Compile and execute on Linux, macOS, Windows and even the web via WebASM!
 - Embed a Nimbus as a component within another user interface (if you really want to go nuts)
 
 _Disclaimer: Nimgobus is a tribute project and is in no way linked to or endorsed by RM plc._
