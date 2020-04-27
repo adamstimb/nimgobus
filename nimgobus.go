@@ -43,12 +43,14 @@ type Nimbus struct {
 	selectedTextBox       int
 	cursorPosition        colRow
 	charImages0           [256]*ebiten.Image
+	charImages1           [256]*ebiten.Image
 }
 
 // Init initializes a new Nimbus
 func (n *Nimbus) Init() {
 	n.loadLogoImage()
-	n.loadCharsetImages()
+	n.loadCharsetImages(0)
+	n.loadCharsetImages(1)
 	n.borderSize = 50
 	n.Monitor, _ = ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2), ebiten.FilterDefault)
 	n.paper, _ = ebiten.NewImage(640, 250, ebiten.FilterDefault)
@@ -102,14 +104,24 @@ func (n *Nimbus) loadLogoImage() {
 }
 
 // loadCharsetImages loads the charset images
-func (n *Nimbus) loadCharsetImages() {
-	img, _, err := image.Decode(bytes.NewReader(images.CharSetZeroImage))
+func (n *Nimbus) loadCharsetImages(charset int) {
+	var img image.Image
+	var err error
+	if charset == 0 {
+		img, _, err = image.Decode(bytes.NewReader(images.CharSetZeroImage))
+	} else {
+		img, _, err = image.Decode(bytes.NewReader(images.CharSetOneImage))
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
 	img2, _ := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 	for i := 0; i <= 255; i++ {
-		n.charImages0[i] = n.charImageSelecta(img2, i)
+		if charset == 0 {
+			n.charImages0[i] = n.charImageSelecta(img2, i)
+		} else {
+			n.charImages1[i] = n.charImageSelecta(img2, i)
+		}
 	}
 }
 
