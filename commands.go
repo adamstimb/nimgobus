@@ -54,7 +54,7 @@ func (n *Nimbus) SetBorder(c int) {
 
 // PlonkChar plots a character on the paper at a given location
 func (n *Nimbus) PlonkChar(c, x, y, colour int) {
-	n.drawChar(n.paper, c, x, y, colour)
+	n.drawChar(n.paper, c, x, y, colour, n.charset)
 }
 
 // Plot draws a string of characters on the paper at a given location
@@ -68,7 +68,7 @@ func (n *Nimbus) Plot(text string, x, y, xsize, ysize, colour int) {
 	// draw chars on the image
 	xpos := 0
 	for _, c := range text {
-		n.drawChar(img, int(c), xpos, 0, colour)
+		n.drawChar(img, int(c), xpos, 0, colour, n.charset)
 		xpos += 8
 	}
 	// Scale img and draw on paper
@@ -217,7 +217,7 @@ func (n *Nimbus) Put(c int) {
 	op.GeoM.Translate(ex, ey)
 	n.paper.DrawImage(img, op)
 	// Draw the char
-	n.drawChar(n.paper, c, int(ex), int(ey), n.penColour)
+	n.drawChar(n.paper, c, int(ex), int(ey), n.penColour, n.charset)
 	// Update relative cursor position
 	relCurPos.col++
 	// Carriage return?
@@ -285,6 +285,17 @@ func (n *Nimbus) Line(p ...int) {
 	for i := 0; i < len(p)-2; i += 2 {
 		n.drawLine(p[i], p[i+1], p[i+2], p[i+3], colour)
 	}
+}
+
+// SetCharset selected either the default Nimbus charset (0) or the alternative
+// charset (1)
+func (n *Nimbus) SetCharset(i int) {
+	// Validate
+	if i != 0 && i != 1 {
+		panic("Invalid charset")
+	}
+	// set charset
+	n.charset = i
 }
 
 // drawLine uses the Bresenham algorithm to draw a straight line on the Nimbus paper

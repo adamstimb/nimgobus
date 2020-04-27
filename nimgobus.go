@@ -182,7 +182,7 @@ func (n *Nimbus) charImageSelecta(img *ebiten.Image, c int) *ebiten.Image {
 }
 
 // drawChar draws a character at a specific location on an image
-func (n *Nimbus) drawChar(image *ebiten.Image, c, x, y, colour int) {
+func (n *Nimbus) drawChar(image *ebiten.Image, c, x, y, colour, charset int) {
 	// Draw char on image and apply colour
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
@@ -191,5 +191,9 @@ func (n *Nimbus) drawChar(image *ebiten.Image, c, x, y, colour int) {
 	g := float64(rgba.G) / 0xff
 	b := float64(rgba.B) / 0xff
 	op.ColorM.Translate(r, g, b, 0)
-	image.DrawImage(n.charImages0[c], op)
+	if charset == 0 {
+		image.DrawImage(n.charImages0[c], op)
+	} else {
+		image.DrawImage(n.charImages1[c], op)
+	}
 }
