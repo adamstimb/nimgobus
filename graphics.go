@@ -125,10 +125,17 @@ func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
 	n.validateColour(opt.Brush)
 	// Calculate points and corresponding angle using Bresenham's algorithm
 	x := 0
+	y := r
 	d := 3 - 2*r
 	points := make(map[float64]xyCoord)
-	points = drawCircle(points, xc, yc, x, r, r)
-	for y := r; y >= x; y-- {
+	points = drawCircle(points, xc, yc, x, y)
+	path := drawCircleVectors(points)
+	// Fill the shape on paper
+	op := &vector.FillOptions{
+		Color: n.convertColour(opt.Brush),
+	}
+	path.Fill(n.paper, op)
+	for y >= x {
 		x++
 		if d > 0 {
 			y--
@@ -136,11 +143,19 @@ func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
 		} else {
 			d = d + 4*x + 6
 		}
-		points = drawCircle(points, xc, yc, x, y, r)
+		points = drawCircle(points, xc, yc, x, y)
+		path = drawCircleVectors(points)
+		// Fill the shape on paper
+		op = &vector.FillOptions{
+			Color: n.convertColour(opt.Brush),
+		}
+		path.Fill(n.paper, op)
 	}
-	// All points generated so sort by angle and draw vectors
-	var path vector.Path
+}
+
+func drawCircleVectors(points map[float64]xyCoord) vector.Path {
 	var keys []float64
+	var path vector.Path
 	for k := range points {
 		keys = append(keys, k)
 	}
@@ -155,16 +170,11 @@ func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
 			path.LineTo(float32(points[k].x), float32(points[k].y))
 		}
 	}
-	path.LineTo(float32(points[keys[0]].x), float32(points[keys[0]].y))
-	// Fill the shape on paper
-	op := &vector.FillOptions{
-		Color: n.convertColour(opt.Brush),
-	}
-	path.Fill(n.paper, op)
+	return path
 }
 
 // drawCircle draws a filled 8-sided polygon approximate to a circle of radius r
-func drawCircle(points map[float64]xyCoord, xc, yc, x, y, r int) map[float64]xyCoord {
+func drawCircle(points map[float64]xyCoord, xc, yc, x, y int) map[float64]xyCoord {
 	var coords [8]xyCoord
 	coords[0] = xyCoord{xc + x, yc + y}
 	coords[1] = xyCoord{xc - x, yc + y}
@@ -175,7 +185,7 @@ func drawCircle(points map[float64]xyCoord, xc, yc, x, y, r int) map[float64]xyC
 	coords[6] = xyCoord{xc + y, yc - x}
 	coords[7] = xyCoord{xc - y, yc - x}
 	for _, coord := range coords {
-		angle := (math.Asin(float64(coord.y-yc) / float64(r)))
+		angle := (math.Atan(float64(coord.y-yc) / float64(coord.x-xc))) * 180 / math.Pi
 		if math.IsNaN(angle) {
 			angle = 0.0
 		}
