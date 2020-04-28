@@ -1,7 +1,6 @@
 package nimgobus
 
 import (
-	"fmt"
 	"image"
 	"math"
 	"sort"
@@ -162,7 +161,6 @@ func drawCircleVectors(points map[float64]xyCoord) vector.Path {
 	sort.Float64s(keys)
 	start := true
 	for _, k := range keys {
-		fmt.Println(k)
 		if start {
 			path.MoveTo(float32(points[k].x), float32(points[k].y))
 			start = false
@@ -185,9 +183,21 @@ func drawCircle(points map[float64]xyCoord, xc, yc, x, y int) map[float64]xyCoor
 	coords[6] = xyCoord{xc + y, yc - x}
 	coords[7] = xyCoord{xc - y, yc - x}
 	for _, coord := range coords {
-		angle := (math.Atan(float64(coord.y-yc) / float64(coord.x-xc))) * 180 / math.Pi
-		if math.IsNaN(angle) {
-			angle = 0.0
+		opp := math.Abs(float64(coord.y - yc))
+		adj := math.Abs(float64(coord.x - xc))
+		partialAngle := math.Atan(opp/adj) * 180 / math.Pi
+		var angle float64
+		if coord.y >= yc && coord.x >= xc {
+			angle = partialAngle
+		}
+		if coord.y <= yc && coord.x >= xc {
+			angle = 90 + partialAngle
+		}
+		if coord.y <= yc && coord.x <= xc {
+			angle = 180 + partialAngle
+		}
+		if coord.y >= yc && coord.x <= xc {
+			angle = 270 + partialAngle
 		}
 		points[angle] = xyCoord{coord.x, coord.y}
 	}
