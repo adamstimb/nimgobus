@@ -12,7 +12,7 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
-// cuolRow defines a column, row position
+// colRow defines a column, row position
 type colRow struct {
 	col int
 	row int
@@ -35,6 +35,7 @@ type Nimbus struct {
 	borderColour          int
 	paperColour           int
 	penColour             int
+	brushColour           int
 	charset               int
 	cursorChar            int
 	defaultHighResPalette []int
@@ -66,6 +67,7 @@ func (n *Nimbus) Init() {
 	n.borderColour = 0
 	n.paperColour = 0
 	n.penColour = 3
+	n.brushColour = 3
 	n.charset = 0
 	n.cursorMode = 0
 	n.cursorChar = 95

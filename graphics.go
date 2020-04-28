@@ -8,7 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/vector"
 )
 
-// PlonkLogo draws the RM Nimbus logo with bottom left-hand corner at (x, y)
+// PlonkLogo draws the RM Nimbus logo
 func (n *Nimbus) PlonkLogo(x, y int) {
 	// Convert position
 	_, height := n.logoImage.Size()
@@ -20,48 +20,71 @@ func (n *Nimbus) PlonkLogo(x, y int) {
 	n.paper.DrawImage(n.logoImage, op)
 }
 
+// PlotOptions describes optional parameters for the Plot command.  Plot will
+// interpret zero values for SizeX and SizeY as 1.
+type PlotOptions struct {
+	Brush     int
+	Font      int
+	Direction int
+	SizeX     int
+	SizeY     int
+}
+
 // Plot draws a string of characters on the paper at a given location
-// with the colour and size of your choice
-func (n *Nimbus) Plot(text string, x, y, xsize, ysize, colour int) {
-	// Validate colour
-	n.validateColour(colour)
+// with the colour and size of your choice.
+func (n *Nimbus) Plot(opt PlotOptions, text string, x, y int) {
+	// Handle default size values
+	if opt.SizeX == 0 {
+		opt.SizeX = 1
+	}
+	if opt.SizeY == 0 {
+		opt.SizeY = 1
+	}
+	// Validate brush
+	n.validateColour(opt.Brush)
 	// Create a new image big enough to contain the plotted chars
 	// (without scaling)
 	img, _ := ebiten.NewImage(len(text)*10, 10, ebiten.FilterDefault)
 	// draw chars on the image
 	xpos := 0
 	for _, c := range text {
-		n.drawChar(img, int(c), xpos, 0, colour, n.charset)
+		n.drawChar(img, int(c), xpos, 0, opt.Brush, opt.Font)
 		xpos += 8
 	}
 	// Scale img and draw on paper
 	ex, ey := n.convertPos(x, y, 10)
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(float64(xsize), float64(ysize))
+	op.GeoM.Scale(float64(opt.SizeX), float64(opt.SizeY))
 	op.GeoM.Translate(ex, ey)
 	n.paper.DrawImage(img, op)
 }
 
-// Line draws connected lines on the screen.  The first n pairs of parameters are
-// co-ordinates, and the final parameter is the brush colour.
-func (n *Nimbus) Line(p ...int) {
-	// Extract colour
-	colour := p[len(p)-1]
-	// Remove colour parameter
-	p = p[:len(p)-1]
+// LineOptions describes optional parameters for the Line command.
+type LineOptions struct {
+	Brush int
+}
+
+// Line draws connected lines on the screen.  x, y values are passed in the variadic
+// p parameter.
+func (n *Nimbus) Line(opt LineOptions, p ...int) {
+	// Validate colour
+	n.validateColour(opt.Brush)
 	// Use drawLine to draw connected lines
 	for i := 0; i < len(p)-2; i += 2 {
-		n.drawLine(p[i], p[i+1], p[i+2], p[i+3], colour)
+		n.drawLine(p[i], p[i+1], p[i+2], p[i+3], opt.Brush)
 	}
 }
 
-// Area draws a filled polygon on the screen.  The first n pairs of parameters are
-// co-ordinates, and the final parameter is the brush colour.
-func (n *Nimbus) Area(p ...int) {
-	// Extract colour
-	colour := p[len(p)-1]
-	// Remove colour parameter
-	p = p[:len(p)-1]
+// AreaOptions describes optional parameters for the Area command
+type AreaOptions struct {
+	Brush int
+}
+
+// Area draws a filled polygon on the screen.  x, y values are passed in the variadic
+// p parameter.
+func (n *Nimbus) Area(opt AreaOptions, p ...int) {
+	// Validate colour
+	n.validateColour(opt.Brush)
 	// Use vector to draw the polygon
 	var path vector.Path
 	ex, ey := n.convertPos(p[0], p[1], 1)
@@ -78,7 +101,7 @@ func (n *Nimbus) Area(p ...int) {
 	}
 	// Fill the shape on paper
 	op := &vector.FillOptions{
-		Color: n.convertColour(colour),
+		Color: n.convertColour(opt.Brush),
 	}
 	path.Fill(n.paper, op)
 }

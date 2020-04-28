@@ -18,6 +18,7 @@ func (n *Nimbus) SetMode(columns int) {
 		n.paperColour = 0
 		n.borderColour = 0
 		n.penColour = 15
+		n.brushColour = 15
 		n.palette = n.defaultLowResPalette
 	}
 	if columns == 80 {
@@ -27,6 +28,7 @@ func (n *Nimbus) SetMode(columns int) {
 		n.paperColour = 0
 		n.borderColour = 0
 		n.penColour = 3
+		n.brushColour = 3
 	}
 	n.cursorPosition = colRow{1, 1}              // Relocate cursor
 	n.paper.Fill(n.convertColour(n.paperColour)) // Apply paper colour
