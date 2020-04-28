@@ -122,6 +122,10 @@ type xyCoord struct {
 func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
 	// Validate colour
 	n.validateColour(opt.Brush)
+	// Convert co-ordinates
+	ex, ey := n.convertPos(xc, yc, 1)
+	xc = int(ex)
+	yc = int(ey)
 	// Calculate points and corresponding angle using Bresenham's algorithm
 	x := 0
 	y := r
