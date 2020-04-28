@@ -5,6 +5,7 @@ import (
 
 	"github.com/StephaneBunel/bresenham"
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/vector"
 )
 
 // PlonkLogo draws the RM Nimbus logo with bottom left-hand corner at (x, y)
@@ -52,6 +53,34 @@ func (n *Nimbus) Line(p ...int) {
 	for i := 0; i < len(p)-2; i += 2 {
 		n.drawLine(p[i], p[i+1], p[i+2], p[i+3], colour)
 	}
+}
+
+// Area draws a filled polygon on the screen.  The first n pairs of parameters are
+// co-ordinates, and the final parameter is the brush colour.
+func (n *Nimbus) Area(p ...int) {
+	// Extract colour
+	colour := p[len(p)-1]
+	// Remove colour parameter
+	p = p[:len(p)-1]
+	// Use vector to draw the polygon
+	var path vector.Path
+	ex, ey := n.convertPos(p[0], p[1], 1)
+	path.MoveTo(float32(ex), float32(ey)) // Go to start position
+	for i := 2; i < len(p)-1; i += 2 {
+		ex, ey = n.convertPos(p[i], p[i+1], 1)
+		path.LineTo(float32(ex), float32(ey))
+	}
+	// Is the shape closed?  If not, draw a line back to start position
+	if p[len(p)-2] != p[0] || p[len(p)-1] != p[1] {
+		// Shape is open so close it
+		ex, ey = n.convertPos(p[0], p[1], 1)
+		path.MoveTo(float32(ex), float32(ey))
+	}
+	// Fill the shape on paper
+	op := &vector.FillOptions{
+		Color: n.convertColour(colour),
+	}
+	path.Fill(n.paper, op)
 }
 
 // drawLine uses the Bresenham algorithm to draw a straight line on the Nimbus paper

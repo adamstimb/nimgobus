@@ -1,6 +1,6 @@
 # ![nimgobus](nimgobus.png)
 
-An [Ebiten](https://ebiten.org/) extension for building vaporwave apps and games in Go.
+An [Ebiten](https://ebiten.org/) extension for building retro apps and games in Go.
 
 ## About
 
