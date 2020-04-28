@@ -72,9 +72,16 @@ func Example() {
 	nim.SetPaper(1)  // Dark blue paper
 	nim.Cls()        // Clear screen
 	// Plot some text with a shadow effect
-	nim.Plot("Nimgobus", 65, 150, 3, 6, 0)
-	nim.Plot("Nimgobus", 67, 152, 3, 6, 14)
-	nim.Plot("it ain't no real", 100, 70, 1, 1, 13)
+	op := nimgobus.PlotOptions{
+		SizeX: 3, SizeY: 6, Brush: 0
+	}
+	nim.Plot(op, "Nimgobus", 65, 150)
+	op.Brush = 14
+	nim.Plot(op, "Nimgobus", 67, 152)
+	op.SizeX = 1
+	op.SizeY = 1
+	op.Brush = 13
+	nim.Plot(op, "it ain't no real", 100, 70)
 	nim.PlonkLogo(8, 8) // Draw the Nimbus BIOS logo
 }
 
