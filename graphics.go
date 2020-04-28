@@ -1,6 +1,7 @@
 package nimgobus
 
 import (
+	"fmt"
 	"image"
 	"math"
 	"sort"
@@ -113,6 +114,11 @@ type CircleOptions struct {
 	Brush int
 }
 
+// SliceOptions describes optional parameters for the Slice command.
+type SliceOptions struct {
+	Brush int
+}
+
 type xyCoord struct {
 	x int
 	y int
@@ -131,13 +137,7 @@ func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
 	y := r
 	d := 3 - 2*r
 	points := make(map[float64]xyCoord)
-	points = drawCircle(points, xc, yc, x, y)
-	path := drawCircleVectors(points)
-	// Fill the shape on paper
-	op := &vector.FillOptions{
-		Color: n.convertColour(opt.Brush),
-	}
-	path.Fill(n.paper, op)
+	points = addCirclePoints(points, xc, yc, x, y)
 	for y >= x {
 		x++
 		if d > 0 {
@@ -146,17 +146,92 @@ func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
 		} else {
 			d = d + 4*x + 6
 		}
-		points = drawCircle(points, xc, yc, x, y)
-		path = drawCircleVectors(points)
-		// Fill the shape on paper
-		op = &vector.FillOptions{
-			Color: n.convertColour(opt.Brush),
-		}
-		path.Fill(n.paper, op)
+		points = addCirclePoints(points, xc, yc, x, y)
 	}
+	// Draw the circle as a filled polygon
+	op := &vector.FillOptions{
+		Color: n.convertColour(opt.Brush),
+	}
+	path := makeCircleVectors(points)
+	path.Fill(n.paper, op)
 }
 
-func drawCircleVectors(points map[float64]xyCoord) vector.Path {
+// Slice draws a circle slice....
+func (n *Nimbus) Slice(opt SliceOptions, r, startAngle, stopAngle, xc, yc int) {
+	// Validate colour
+	n.validateColour(opt.Brush)
+	// Convert co-ordinates
+	ex, ey := n.convertPos(xc, yc, 1)
+	xc = int(ex)
+	yc = int(ey)
+	// Calculate points and corresponding angle using Bresenham's algorithm
+	x := 0
+	y := r
+	d := 3 - 2*r
+	points := make(map[float64]xyCoord)
+	points = addCirclePoints(points, xc, yc, x, y)
+	for y >= x {
+		x++
+		if d > 0 {
+			y--
+			d = d + 4*(x-y) + 10
+		} else {
+			d = d + 4*x + 6
+		}
+		points = addCirclePoints(points, xc, yc, x, y)
+	}
+	// Draw the circle as a filled polygon
+	op := &vector.FillOptions{
+		Color: n.convertColour(opt.Brush),
+	}
+	path := makeSliceVectors(points, xc, yc, startAngle, stopAngle)
+	path.Fill(n.paper, op)
+}
+
+// makeSliceVectors takes point coorindates for a circle and createa vectors
+// that describe a slice
+func makeSliceVectors(points map[float64]xyCoord, xc, yc, startAngle, stopAngle int) vector.Path {
+	var keys []float64
+	var path vector.Path
+	for k := range points {
+		keys = append(keys, k)
+	}
+	sort.Float64s(keys)
+	start := false
+	drawing := true
+	i := 0
+	for drawing {
+		k := keys[i]
+
+		if start {
+			fmt.Println(k, float32(points[k].x), float32(points[k].y))
+			// slice has started so draw vectors around circle
+			path.LineTo(float32(points[k].x), float32(points[k].y))
+		}
+		if k >= float64(startAngle) && start == false {
+			// slice needs to start
+			path.MoveTo(float32(xc), float32(yc))
+			path.LineTo(float32(points[k].x), float32(points[k].y))
+			start = true
+		}
+		if k >= float64(stopAngle) && start {
+			// slice needs to stop
+			path.LineTo(float32(points[k].x), float32(points[k].y))
+			path.LineTo(float32(xc), float32(yc))
+			drawing = false
+		}
+		// increment i and overflow if required
+		i++
+		if i >= len(keys) {
+			// overflow
+			i = 0
+		}
+	}
+	return path
+}
+
+// makeCircleVectors takes point coordinates and converts them into vectors
+func makeCircleVectors(points map[float64]xyCoord) vector.Path {
 	var keys []float64
 	var path vector.Path
 	for k := range points {
@@ -175,8 +250,8 @@ func drawCircleVectors(points map[float64]xyCoord) vector.Path {
 	return path
 }
 
-// drawCircle draws a filled 8-sided polygon approximate to a circle of radius r
-func drawCircle(points map[float64]xyCoord, xc, yc, x, y int) map[float64]xyCoord {
+// addCirclePoints calculates 8 symmetrical points around a circle
+func addCirclePoints(points map[float64]xyCoord, xc, yc, x, y int) map[float64]xyCoord {
 	var coords [8]xyCoord
 	coords[0] = xyCoord{xc + x, yc + y}
 	coords[1] = xyCoord{xc - x, yc + y}
@@ -192,13 +267,14 @@ func drawCircle(points map[float64]xyCoord, xc, yc, x, y int) map[float64]xyCoor
 		partialAngle := math.Atan(opp/adj) * 180 / math.Pi
 		var angle float64
 		if coord.y >= yc && coord.x >= xc {
-			angle = partialAngle
+			// angle = partialAngle
+			angle = 90 - partialAngle
 		}
 		if coord.y <= yc && coord.x >= xc {
 			angle = 90 + partialAngle
 		}
 		if coord.y <= yc && coord.x <= xc {
-			angle = 180 + partialAngle
+			angle = 180 + (90 - partialAngle)
 		}
 		if coord.y >= yc && coord.x <= xc {
 			angle = 270 + partialAngle
@@ -206,11 +282,6 @@ func drawCircle(points map[float64]xyCoord, xc, yc, x, y int) map[float64]xyCoor
 		points[angle] = xyCoord{coord.x, coord.y}
 	}
 	return points
-}
-
-// SliceOptions describes optional parameters for the Slice command.
-type SliceOptions struct {
-	Brush int
 }
 
 // drawLine uses the Bresenham algorithm to draw a straight line on the Nimbus paper
