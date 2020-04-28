@@ -5,10 +5,10 @@
 // feel of classic Nimbus software such as PaintSPA, Ourfacts and Caxton Press.
 // However, it is not an emulation of the Nimbus itself.
 //
-// For the sake of authenticity the syntax used in nimgobus is influence by RM Basic
+// For the sake of authenticity the syntax used in nimgobus is influenced by RM Basic
 // (the Basic interpreter supplied with the original Nimbus) including the way screen
 // coordinates are handled.  It is therefore highly recommended to read the original
-// documentation for RM Basic (see links on github page)
+// documentation for RM Basic (see links on github page).
 //
 // Go and RM Basic have some surprising similarities, for example the := operator and
 // support for variadic functions.  However, the use of optional arguments in RM

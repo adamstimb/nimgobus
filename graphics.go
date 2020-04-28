@@ -1,7 +1,10 @@
 package nimgobus
 
 import (
+	"fmt"
 	"image"
+	"math"
+	"sort"
 
 	"github.com/StephaneBunel/bresenham"
 	"github.com/hajimehoshi/ebiten"
@@ -104,6 +107,86 @@ func (n *Nimbus) Area(opt AreaOptions, p ...int) {
 		Color: n.convertColour(opt.Brush),
 	}
 	path.Fill(n.paper, op)
+}
+
+// CircleOptions describes optional parameters for the Circle command.
+type CircleOptions struct {
+	Brush int
+}
+
+type xyCoord struct {
+	x int
+	y int
+}
+
+// Circle draws a circle....
+func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
+	// Validate colour
+	n.validateColour(opt.Brush)
+	// Calculate points and corresponding angle using Bresenham's algorithm
+	x := 0
+	d := 3 - 2*r
+	points := make(map[float64]xyCoord)
+	points = drawCircle(points, xc, yc, x, r, r)
+	for y := r; y >= x; y-- {
+		x++
+		if d > 0 {
+			y--
+			d = d + 4*(x-y) + 10
+		} else {
+			d = d + 4*x + 6
+		}
+		points = drawCircle(points, xc, yc, x, y, r)
+	}
+	// All points generated so sort by angle and draw vectors
+	var path vector.Path
+	var keys []float64
+	for k := range points {
+		keys = append(keys, k)
+	}
+	sort.Float64s(keys)
+	start := true
+	for _, k := range keys {
+		fmt.Println(k)
+		if start {
+			path.MoveTo(float32(points[k].x), float32(points[k].y))
+			start = false
+		} else {
+			path.LineTo(float32(points[k].x), float32(points[k].y))
+		}
+	}
+	path.LineTo(float32(points[keys[0]].x), float32(points[keys[0]].y))
+	// Fill the shape on paper
+	op := &vector.FillOptions{
+		Color: n.convertColour(opt.Brush),
+	}
+	path.Fill(n.paper, op)
+}
+
+// drawCircle draws a filled 8-sided polygon approximate to a circle of radius r
+func drawCircle(points map[float64]xyCoord, xc, yc, x, y, r int) map[float64]xyCoord {
+	var coords [8]xyCoord
+	coords[0] = xyCoord{xc + x, yc + y}
+	coords[1] = xyCoord{xc - x, yc + y}
+	coords[2] = xyCoord{xc + x, yc - y}
+	coords[3] = xyCoord{xc - x, yc - y}
+	coords[4] = xyCoord{xc + y, yc + x}
+	coords[5] = xyCoord{xc - y, yc + x}
+	coords[6] = xyCoord{xc + y, yc - x}
+	coords[7] = xyCoord{xc - y, yc - x}
+	for _, coord := range coords {
+		angle := (math.Asin(float64(coord.y-yc) / float64(r)))
+		if math.IsNaN(angle) {
+			angle = 0.0
+		}
+		points[angle] = xyCoord{coord.x, coord.y}
+	}
+	return points
+}
+
+// SliceOptions describes optional parameters for the Slice command.
+type SliceOptions struct {
+	Brush int
 }
 
 // drawLine uses the Bresenham algorithm to draw a straight line on the Nimbus paper
