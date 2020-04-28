@@ -1,3 +1,24 @@
+// Package nimgobus is an extension of the excellent Ebiten game engine. It mimicks
+// the 16-bit graphics and text drivers of the RM Nimbus PC186, found in classrooms
+// all over the UK in the 1980s and early 90s. With Nimgobus you can develop Go
+// applications that have the cheesey and often 'chromatically challenging' look and
+// feel of classic Nimbus software such as PaintSPA, Ourfacts and Caxton Press.
+// However, it is not an emulation of the Nimbus itself.
+//
+// For the sake of authenticity the syntax used in nimgobus is influence by RM Basic
+// (the Basic interpreter supplied with the original Nimbus) including the way screen
+// coordinates are handled.  It is therefore highly recommended to read the original
+// documentation for RM Basic (see links on github page)
+//
+// Go and RM Basic have some surprising similarities, for example the := operator and
+// support for variadic functions.  However, the use of optional arguments in RM
+// Basic functions (for example BRUSH, DIRECTION, FONT in the PLOT command) are not
+// so easily reproduced because Go does not support functions with optional
+// parameters.  Where optional parameters are used by functions in RM Basic, nimgobus
+// instead accepts an 'options' struct as a parameter.  In some cases this has
+// rendered obsolete RM Basic features that set default values for BRUSH, FONT, etc.
+//
+// Disclaimer: Nimgobus is a tribute project and is in no way linked to or endorsed by RM plc.
 package nimgobus
 
 import (
@@ -26,7 +47,8 @@ type textBox struct {
 	row2 int
 }
 
-// Nimbus acts as a container for all the components of the monitor
+// Nimbus acts as a container for all the components of the Nimbus monitor.  You
+// only need to call the Init() method after declaring a new Nimbus.
 type Nimbus struct {
 	Monitor               *ebiten.Image
 	paper                 *ebiten.Image
@@ -35,7 +57,6 @@ type Nimbus struct {
 	borderColour          int
 	paperColour           int
 	penColour             int
-	brushColour           int
 	charset               int
 	cursorChar            int
 	defaultHighResPalette []int
@@ -52,11 +73,14 @@ type Nimbus struct {
 	charImages1           [256]*ebiten.Image
 }
 
-// Init initializes a new Nimbus
+// Init initializes a new Nimbus.  You must call this method after declaring a
+// new Nimbus variable.
 func (n *Nimbus) Init() {
+	// Load Nimbus logo image and both charsets
 	n.loadLogoImage()
 	n.loadCharsetImages(0)
 	n.loadCharsetImages(1)
+	// Set init values of everything else
 	n.borderSize = 50
 	n.Monitor, _ = ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2), ebiten.FilterDefault)
 	n.paper, _ = ebiten.NewImage(640, 250, ebiten.FilterDefault)
@@ -67,13 +91,12 @@ func (n *Nimbus) Init() {
 	n.borderColour = 0
 	n.paperColour = 0
 	n.penColour = 3
-	n.brushColour = 3
 	n.charset = 0
-	n.cursorMode = 0
+	n.cursorMode = -1
 	n.cursorChar = 95
 	n.cursorCharset = 0
 	n.cursorPosition = colRow{1, 1}
-	n.cursorFlash = true
+	n.cursorFlash = false
 	n.selectedTextBox = 0
 	// Initialize with mode 80 textboxes
 	for i := 0; i < 10; i++ {
@@ -102,7 +125,7 @@ func (n *Nimbus) flashCursor() {
 	}
 }
 
-// Update draws the monitor image
+// Update redraws the Nimbus monitor image
 func (n *Nimbus) Update() {
 
 	// Copy paper so we can apply overlays (e.g. cursor)
