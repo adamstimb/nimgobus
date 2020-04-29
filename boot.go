@@ -36,7 +36,8 @@ func drawBackground(n *Nimbus) {
 	if err != nil {
 		panic("Could detect system information")
 	}
-	serialNumber := "21/06809" // In honour of whichever physical machine donate its ROM to MAME
+	firmwareVersion = fmt.Sprintf("Firmware version: %s", firmwareVersion)
+	serialNumber := "Serial number:  21/06809" // In honour of whichever physical machine donate its ROM to MAME
 	memInfo, err := host.Memory()
 	mainMemSize := fmt.Sprintf("main    memory size %7d Mbytes", bToMb(memInfo.Available))
 	virtualMemSize := fmt.Sprintf("virtual memory size %7d Mbytes", bToMb(memInfo.VirtualTotal))
@@ -73,14 +74,19 @@ func drawBackground(n *Nimbus) {
 	n.Plot(plotOpts, "Welcome", 236, 147)
 
 	// Firmware version and serial number
-	// test system info
+	areaOpts.Brush = 2
+	n.Area(areaOpts, 393, 4, 632, 4, 632, 30, 393, 30, 393, 4)
+	areaOpts.Brush = 3
+	n.Area(areaOpts, 395, 5, 629, 5, 629, 29, 395, 29, 395, 5)
 	plotOpts.Brush = 0
 	plotOpts.SizeX = 1
 	plotOpts.SizeY = 1
+	n.Plot(plotOpts, firmwareVersion, 400, 17)
+	n.Plot(plotOpts, serialNumber, 400, 7)
 
-	n.Print(firmwareVersion)
-	n.Print(mainMemSize)
-	n.Print(virtualMemSize)
-	n.Print(totalMemSize)
-	n.Print(serialNumber)
+	// Memory
+	plotOpts.Brush = 0
+	n.Plot(plotOpts, mainMemSize, 15, 25)
+	n.Plot(plotOpts, virtualMemSize, 15, 15)
+	n.Plot(plotOpts, totalMemSize, 15, 5)
 }
