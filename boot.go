@@ -3,6 +3,7 @@ package nimgobus
 import (
 	"fmt"
 	"runtime"
+	"time"
 
 	"github.com/elastic/go-sysinfo"
 )
@@ -15,8 +16,23 @@ func (n *Nimbus) Boot() {
 		Brush: 3,
 	}
 	n.Plot(plotOpts, "Please supply an operating system", 188, 100)
+	time.Sleep(1 * time.Second)
+	plotOpts.Brush = 1
+	n.Plot(plotOpts, "Please supply an operating system", 188, 100)
+	plotOpts.Brush = 3
+	n.Plot(plotOpts, "Looking for an operating system - please wait", 140, 100)
+	time.Sleep(3 * time.Second)
+	plotOpts.Brush = 1
+	n.Plot(plotOpts, "Looking for an operating system - please wait", 140, 100)
+	plotOpts.Brush = 3
+	n.Plot(plotOpts, "Loading operating system", 224, 100)
+	time.Sleep(3 * time.Second)
+	n.SetMode(80)
+	n.SetColour(0, 0)
+	n.SetCursor(0)
 }
 
+// convert bytes to Mb
 func bToMb(b uint64) uint64 {
 	return b / 1024 / 1024
 }
