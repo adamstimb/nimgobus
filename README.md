@@ -69,7 +69,7 @@ Some commands have been implement in nimgobus in exactly they same way as in RM 
 
 ![greeting](examples/greeting/greeting.gif)
 
-[modes.go] (examples/modes/modes.go)
+[modes.go](examples/modes/modes.go)
 
 ![modes](examples/modes/modes.gif)
 
