@@ -124,8 +124,73 @@ type xyCoord struct {
 	y int
 }
 
+// drawCircle draws a circle or slice and should only be called by either
+// Circle or Slice functions.  To draw a full circle set startAngle and
+// stopAngle both to 0.
+func (n *Nimbus) drawCircle(opt CircleOptions, r, startAngle, stopAngle, xc, yc int) {
+	// Handle slice or whole circle
+	var slice bool
+	if startAngle == 0 && stopAngle == 0 {
+		slice = false
+	} else {
+		slice = true
+	}
+	// Convert co-ordinates
+	ex, ey := n.convertPos(xc, yc, 1)
+	xc = int(ex)
+	yc = int(ey)
+	// Calculate points and corresponding angle using Bresenham's algorithm
+	x := 0
+	y := r
+	d := 3 - 2*r
+	points := make(map[float64]xyCoord)
+	points = addCirclePoints(points, xc, yc, x, y)
+	for y >= x {
+		x++
+		if d > 0 {
+			y--
+			d = d + 4*(x-y) + 10
+		} else {
+			d = d + 4*x + 6
+		}
+		points = addCirclePoints(points, xc, yc, x, y)
+	}
+	// Draw the shape as a filled polygon
+	op := &vector.FillOptions{
+		Color: n.convertColour(opt.Brush),
+	}
+	var path vector.Path
+	// Render a whole circle or slice
+	if slice {
+		// slice
+		path = makeSliceVectors(points, xc, yc, startAngle, stopAngle)
+	} else {
+		// whole circle
+		path = makeCircleVectors(points)
+	}
+	path.Fill(n.paper, op)
+}
+
 // Circle draws a circle....
 func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
+	// Validate colour
+	n.validateColour(opt.Brush)
+	// Delegate to drawCircle
+	n.drawCircle(opt, r, 0, 0, xc, yc)
+}
+
+// Slice draws a slice...
+func (n *Nimbus) Slice(opt SliceOptions, r, startAngle, stopAngle, xc, yc int) {
+	// Validate colour
+	n.validateColour(opt.Brush)
+	// Convert sliceoptions to circleoptions and delegate to drawCircle
+	var circleOpts CircleOptions
+	circleOpts.Brush = opt.Brush
+	n.drawCircle(circleOpts, r, startAngle, stopAngle, xc, yc)
+}
+
+// CircleOld draws a circle....
+func (n *Nimbus) CircleOld(opt CircleOptions, r, xc, yc int) {
 	// Validate colour
 	n.validateColour(opt.Brush)
 	// Convert co-ordinates
@@ -156,8 +221,8 @@ func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
 	path.Fill(n.paper, op)
 }
 
-// Slice draws a circle slice....
-func (n *Nimbus) Slice(opt SliceOptions, r, startAngle, stopAngle, xc, yc int) {
+// SliceOld draws a circle slice....
+func (n *Nimbus) SliceOld(opt SliceOptions, r, startAngle, stopAngle, xc, yc int) {
 	// Validate colour
 	n.validateColour(opt.Brush)
 	// Convert co-ordinates
