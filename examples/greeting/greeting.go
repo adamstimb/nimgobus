@@ -86,8 +86,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func main() {
 
-	// Initialize a new Nimbus
-	nim = nimgobus.Nimbus{}
+	// Initialize the Nimbus
 	nim.Init()
 
 	// set up window
