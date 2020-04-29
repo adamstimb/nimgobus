@@ -2,13 +2,28 @@ package nimgobus
 
 import (
 	"fmt"
+	"math/rand"
 	"runtime"
 	"time"
 
 	"github.com/elastic/go-sysinfo"
 )
 
-// Boot simulates the RM Nimbus "Welcome" boot screen
+// randDelay delays for a random number of milliseconds within limits
+func randDelay(min, max int) {
+	rand.Seed(time.Now().UnixNano())
+	delay := time.Duration(rand.Intn(max-min)+min) * time.Millisecond
+	time.Sleep(delay)
+}
+
+// Boot simulates the RM Nimbus "Welcome" boot screen and operating system
+// loading workflow.  The original Nimbus would also display system info, such
+// as firmware version, serial number, memory, etc.  Nimgobus immitates this
+// using the Go compiler version as the firmware version, and displays the
+// actual physical and virtual memory size.  Serial number is a string constant
+// as is the serial number of the Nimbus that provided the ROM dump for the
+// emulation on MAME, from which various bits and pieces were reversed
+// engineering for nimgobus.
 func (n *Nimbus) Boot() {
 	drawBackground(n)
 	plotOpts := PlotOptions{
@@ -16,20 +31,21 @@ func (n *Nimbus) Boot() {
 		Brush: 3,
 	}
 	n.Plot(plotOpts, "Please supply an operating system", 188, 100)
-	time.Sleep(1 * time.Second)
+	randDelay(1000, 2000)
 	plotOpts.Brush = 1
 	n.Plot(plotOpts, "Please supply an operating system", 188, 100)
 	plotOpts.Brush = 3
 	n.Plot(plotOpts, "Looking for an operating system - please wait", 140, 100)
-	time.Sleep(3 * time.Second)
+	randDelay(2500, 3500)
 	plotOpts.Brush = 1
 	n.Plot(plotOpts, "Looking for an operating system - please wait", 140, 100)
 	plotOpts.Brush = 3
 	n.Plot(plotOpts, "Loading operating system", 224, 100)
-	time.Sleep(3 * time.Second)
+	randDelay(2500, 3500)
 	n.SetMode(80)
 	n.SetColour(0, 0)
 	n.SetCursor(0)
+	randDelay(1000, 2000)
 }
 
 // convert bytes to Mb
