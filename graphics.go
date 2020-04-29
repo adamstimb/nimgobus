@@ -171,22 +171,39 @@ func (n *Nimbus) drawCircle(opt CircleOptions, r, startAngle, stopAngle, xc, yc 
 	path.Fill(n.paper, op)
 }
 
-// Circle draws a circle....
-func (n *Nimbus) Circle(opt CircleOptions, r, xc, yc int) {
-	// Validate colour
+// Circle draws a circle of radius r with the center located at x, y.
+func (n *Nimbus) Circle(opt CircleOptions, r, x, y int) {
+	// Validate
 	n.validateColour(opt.Brush)
+	if r < 1 {
+		panic("Radius is out of range")
+	}
 	// Delegate to drawCircle
-	n.drawCircle(opt, r, 0, 0, xc, yc)
+	n.drawCircle(opt, r, 0, 0, x, y)
 }
 
-// Slice draws a slice...
-func (n *Nimbus) Slice(opt SliceOptions, r, startAngle, stopAngle, xc, yc int) {
-	// Validate colour
+// Slice draws a slice of a circle of radius r with the center located at x, y.  The slice
+// begins in degrees startAngle from the vertical (where vertical is 0 or 360 degrees) and
+// ends at stopAngle.
+func (n *Nimbus) Slice(opt SliceOptions, r, startAngle, stopAngle, x, y int) {
+	// Validate
 	n.validateColour(opt.Brush)
+	if r < 1 {
+		panic("Radius is out of range")
+	}
+	if startAngle < 0 || startAngle > 360 {
+		panic("startAngle is out of range")
+	}
+	if stopAngle < 0 || stopAngle > 360 {
+		panic("stopAngle is out of range")
+	}
+	if stopAngle == startAngle {
+		panic("startAngle and stopAngle cannot be equal")
+	}
 	// Convert sliceoptions to circleoptions and delegate to drawCircle
 	var circleOpts CircleOptions
 	circleOpts.Brush = opt.Brush
-	n.drawCircle(circleOpts, r, startAngle, stopAngle, xc, yc)
+	n.drawCircle(circleOpts, r, startAngle, stopAngle, x, y)
 }
 
 // makeSliceVectors takes point coorindates for a circle and creates vectors

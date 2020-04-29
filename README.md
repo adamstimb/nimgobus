@@ -2,6 +2,8 @@
 
 An [Ebiten](https://ebiten.org/) extension for building retro apps and games in Go.
 
+_Nimgobus is a tribute project and is in no way linked to or endorsed by RM plc._
+
 ## About
 
 Nimgobus is an extension of the excellent [Ebiten](https://ebiten.org/) game engine.  It mimicks the 16-bit graphics and text drivers of the [RM Nimbus PC186](https://en.wikipedia.org/wiki/RM_Nimbus), found in classrooms all over the UK in the 1980s and early 90s.  With Nimgobus you can develop Go applications that have the cheesey and often 'chromatically challenging' look and feel of classic Nimbus software such as PaintSPA, Ourfacts and Caxton Press.  However, it is _not_ an emulation of the Nimbus itself.  This means you get the best of both worlds:
@@ -10,13 +12,11 @@ Nimgobus is an extension of the excellent [Ebiten](https://ebiten.org/) game eng
 - Build for Linux, Windows, Mobile and Web thanks to Ebiten's cross-platform support
 - Embed a Nimbus as a component within another user interface (if you really want to go nuts)
 
-_Disclaimer: Nimgobus is a tribute project and is in no way linked to or endorsed by RM plc._
-
 ## Syntax
 
 For the sake of authenticity the syntax used in nimgobus is influenced by RM Basic (the Basic interpreter supplied with the original Nimbus), including the way screen coordinates are handled. It is therefore highly recommended to read the original documentation for RM Basic (see links on github page).
 
-Go and RM Basic have some surprising similarities, for example the := operator and support for variadic functions. However, the use of optional arguments in RM Basic functions (for example BRUSH, DIRECTION, FONT in the PLOT command) are not so easily reproduced because Go does not support functions with optional parameters. Where optional parameters are used by functions in RM Basic, nimgobus instead accepts an 'options' struct as a parameter. In some cases this has rendered obsolete RM Basic features that set default values for BRUSH, FONT, etc.
+Some commands have been implement in nimgobus in exactly they same way as in RM Basic.  Optional arguments, which were used extensively in RM Basic (for example BRUSH, DIRECTION, FONT in the PLOT command) are not so easily reproduced because Go does not support functions with optional parameters. Where optional parameters are used by functions in RM Basic, nimgobus instead accepts an 'options' struct as a parameter. In some cases this has rendered obsolete RM Basic features that set default values for BRUSH, FONT, etc.
 
 ## Installation
 
@@ -146,5 +146,5 @@ func main() {
 - [RM Nimbus](https://en.wikipedia.org/wiki/RM_Nimbus) - Wikipedia article
 - [mame](https://www.mamedev.org/) - comprehensive retro computer emulation project
 - [Freesound pack: Floppy disk drive](https://freesound.org/people/MrAuralization/packs/15891/) - source of the floppy drive sounds
-- [Nimusinator](https://github.com/adamstimb/nimbusinator) - similar package for Python and predecessor to Nimgobus
+- [Nimbusinator](https://github.com/adamstimb/nimbusinator) - the Pythonic predecessor to Nimgobus
 - [Ironstone Innovation](https://ironstoneinnovation.eu) - what I do for a living
