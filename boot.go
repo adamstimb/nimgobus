@@ -1,7 +1,10 @@
 package nimgobus
 
 import (
+	"fmt"
 	"runtime"
+
+	"github.com/elastic/go-sysinfo"
 )
 
 // Boot simulates the RM Nimbus "Welcome" boot screen
@@ -14,15 +17,32 @@ func (n *Nimbus) Boot() {
 	n.Plot(plotOpts, "Please supply an operating system", 188, 100)
 }
 
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
+}
+
 // drawBackground draws the background of the Welcome screen
 func drawBackground(n *Nimbus) {
+
 	// Collect system info
-	firmwareVersion := runtime.Version()
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	firmwareVersion := runtime.Version() // Use Go version instead
 	firmwareVersion = firmwareVersion[2:]
 	if len(firmwareVersion) > 8 {
 		firmwareVersion = firmwareVersion[:8]
 	}
-	//serialNumber := "21/06809"
+	host, err := sysinfo.Host()
+	if err != nil {
+		panic("Could detect system information")
+	}
+	serialNumber := "21/06809" // In honour of whichever physical machine donate its ROM to MAME
+	memInfo, err := host.Memory()
+	mainMemSize := fmt.Sprintf("main    memory size %7d Mbytes", bToMb(memInfo.Available))
+	virtualMemSize := fmt.Sprintf("virtual memory size %7d Mbytes", bToMb(memInfo.VirtualTotal))
+	totalMemSize := fmt.Sprintf("total   memory size %7d Mbytes", bToMb(memInfo.Available+memInfo.VirtualTotal))
+
+	// Red frame, light blue paper, Nimbus logo in a red frame
 	n.SetMode(80)
 	n.SetColour(0, 0)
 	n.SetColour(1, 9)
@@ -46,9 +66,21 @@ func drawBackground(n *Nimbus) {
 	plotOpts := PlotOptions{
 		SizeX: 3, SizeY: 3, Font: 1,
 	}
+
+	// Welcome
 	n.Plot(plotOpts, "Welcome", 238, 145)
 	plotOpts.Brush = 2
 	n.Plot(plotOpts, "Welcome", 236, 147)
+
+	// Firmware version and serial number
 	// test system info
+	plotOpts.Brush = 0
+	plotOpts.SizeX = 1
+	plotOpts.SizeY = 1
+
 	n.Print(firmwareVersion)
+	n.Print(mainMemSize)
+	n.Print(virtualMemSize)
+	n.Print(totalMemSize)
+	n.Print(serialNumber)
 }
