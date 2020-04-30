@@ -56,7 +56,7 @@ func (n *Nimbus) Plot(opt PlotOptions, text string, x, y int) {
 		xpos += 8
 	}
 	// Scale img and draw on paper
-	ex, ey := n.convertPos(x, y, 10)
+	ex, ey := n.convertPos(x, y, 10*opt.SizeY)
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(float64(opt.SizeX), float64(opt.SizeY))
 	op.GeoM.Translate(ex, ey)
@@ -339,14 +339,13 @@ func distance(c1, c2 color.RGBA) float64 {
 // getClosestNimbusColour receives any RGBA and returns the nearest Nimbus RGBA for
 // the current screen mode
 func (n *Nimbus) getClosestNimbusColour(c color.RGBA) color.RGBA {
-	// find Nimbus colour with highest score
+	// find Nimbus colour with lowest score
 	score := 1000.0
 	closestColor := color.RGBA{0, 0, 0, 255}
 	for col := range n.palette {
-		// Calculate score for this colour. If it's higher then
+		// Calculate score for this colour. If it's lower then
 		// update score & closestColor, otherwise go to next
 		tempScore := distance(c, n.convertColour(col))
-
 		if tempScore < score {
 			score = tempScore
 			closestColor = n.convertColour(col)
