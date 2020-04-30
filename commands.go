@@ -30,10 +30,11 @@ func (n *Nimbus) SetMode(columns int) {
 	}
 	n.cursorPosition = colRow{1, 1}              // Relocate cursor
 	n.paper.Fill(n.convertColour(n.paperColour)) // Apply paper colour
-	// Redefine textboxes and clear screen
+	// Redefine textboxes, imageBlocks and clear screen
 	for i := 0; i < 10; i++ {
 		n.textBoxes[i] = textBox{1, 1, columns, 25}
 	}
+	n.imageBlocks = [16]*ebiten.Image{}
 	n.Cls()
 }
 
