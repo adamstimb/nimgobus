@@ -107,7 +107,7 @@ func Track() {
 			x -= 500
 		}
 		y := 125 + int(lat*latScale)
-		nim.Circle(circleOpts, 5, x, y)
+		nim.Circle(circleOpts, 6, x, y)
 		circleOpts.Brush = 3
 		nim.Circle(circleOpts, 4, x, y)
 		nim.SetCurpos(66, 1)
