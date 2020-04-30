@@ -88,29 +88,36 @@ func Track() {
 	nim.SetCharset(1)
 	nim.SetPen(3)
 	nim.Cls()
-	img, _, err := image.Decode(bytes.NewReader(issImages.World))
+	img, _, err := image.Decode(bytes.NewReader(issImages.World500x250))
 	if err != nil {
 		log.Fatal(err)
 	}
 	worldImg, _ := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 	nim.Fetch(worldImg, 1)
 	nim.Writeblock(1, 0, 0)
-	longScale := 640.0 / 360.0
+	longScale := 500.0 / 360.0
 	latScale := 250.0 / 180.0
 	for {
 		long, lat := getPosition()
 		circleOpts := nimgobus.CircleOptions{
 			Brush: 2,
 		}
-		x := int(long*longScale) + 320
-		if x > 640 {
-			x -= 640
+		x := int(long*longScale) + 250
+		if x > 500 {
+			x -= 500
 		}
 		y := 125 + int(lat*latScale)
+		nim.Circle(circleOpts, 5, x, y)
+		circleOpts.Brush = 3
 		nim.Circle(circleOpts, 4, x, y)
-		nim.SetCurpos(1, 1)
-		status := fmt.Sprintf("Latitude: %f  Longitude: %f   ", long, lat)
-		nim.Print(status)
+		nim.SetCurpos(66, 1)
+		nim.Print("Longitude:")
+		nim.SetCurpos(66, 2)
+		nim.Print(fmt.Sprintf("%f", long))
+		nim.SetCurpos(66, 4)
+		nim.Print("Latitude:")
+		nim.SetCurpos(66, 5)
+		nim.Print(fmt.Sprintf("%f", lat))
 		time.Sleep(1 * time.Second)
 	}
 }
