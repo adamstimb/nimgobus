@@ -1,5 +1,5 @@
 /*
-Package nimgobus is Ebiten extension for building building retro apps and games in Go.  It
+Package nimgobus is RM Nimbus-inspired Ebiten extension for building building retro apps and games in Go.  It
 mimicks the 16-bit graphics and text drivers of the RM Nimbus PC186, found in classrooms all
 over the UK in the 1980s and early 90s.
 

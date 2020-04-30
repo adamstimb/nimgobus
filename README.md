@@ -1,6 +1,6 @@
 # ![nimgobus](nimgobus.png)
 
-An [Ebiten](https://ebiten.org/) extension for building retro apps and games in Go.
+An RM Nimbus-inspired [Ebiten](https://ebiten.org/) extension for building retro apps and games in Go.
 
 _Nimgobus is a tribute project and is in no way linked to or endorsed by RM plc._
 
