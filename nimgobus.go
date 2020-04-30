@@ -43,6 +43,7 @@ type Nimbus struct {
 	palette               []int
 	logoImage             *ebiten.Image
 	textBoxes             [10]textBox
+	imageBlocks           [16]*ebiten.Image
 	selectedTextBox       int
 	cursorPosition        colRow
 	cursorMode            int
