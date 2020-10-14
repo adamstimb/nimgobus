@@ -45,7 +45,7 @@ func SplashScreen() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	issImg, _ := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	issImg := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 	nim.SetMode(40)
 	nim.Fetch(issImg, 1)
 	nim.Writeblock(1, 0, 0)
@@ -92,7 +92,7 @@ func Track() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	worldImg, _ := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	worldImg := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 	nim.Fetch(worldImg, 1)
 	nim.Writeblock(1, 0, 0)
 	longScale := 500.0 / 360.0

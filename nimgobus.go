@@ -62,8 +62,8 @@ func (n *Nimbus) Init() {
 	n.loadCharsetImages(1)
 	// Set init values of everything else
 	n.borderSize = 50
-	n.Monitor, _ = ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2), ebiten.FilterDefault)
-	n.paper, _ = ebiten.NewImage(640, 250, ebiten.FilterDefault)
+	n.Monitor = ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2), ebiten.FilterDefault)
+	n.paper = ebiten.NewImage(640, 250, ebiten.FilterDefault)
 	n.basicColours = basicColours
 	n.defaultHighResPalette = defaultHighResPalette
 	n.defaultLowResPalette = defaultLowResPalette
@@ -109,7 +109,7 @@ func (n *Nimbus) flashCursor() {
 func (n *Nimbus) Update() {
 
 	// Copy paper so we can apply overlays (e.g. cursor)
-	paperCopy, _ := ebiten.NewImageFromImage(n.paper, ebiten.FilterDefault)
+	paperCopy := ebiten.NewImageFromImage(n.paper, ebiten.FilterDefault)
 
 	// Apply overlays
 	// Cursor
@@ -124,11 +124,11 @@ func (n *Nimbus) Update() {
 	scaleY := 500.0 / float64(paperY)
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(scaleX, scaleY)
-	scaledPaper, _ := ebiten.NewImage(640, 500, ebiten.FilterDefault)
+	scaledPaper := ebiten.NewImage(640, 500, ebiten.FilterDefault)
 	scaledPaper.DrawImage(paperCopy, op)
 
 	// Add the border around the paper
-	withBorder, _ := ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2), ebiten.FilterDefault)
+	withBorder := ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2), ebiten.FilterDefault)
 	withBorder.Fill(n.convertColour(n.borderColour)) // Apply border colour
 	op = &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(n.borderSize), float64(n.borderSize))
@@ -145,7 +145,7 @@ func (n *Nimbus) loadLogoImage() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	n.logoImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	n.logoImage = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 }
 
 // loadCharsetImages loads the charset images
@@ -160,7 +160,7 @@ func (n *Nimbus) loadCharsetImages(charset int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	img2, _ := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	img2 := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 	for i := 0; i <= 255; i++ {
 		if charset == 0 {
 			n.charImages0[i] = n.charImageSelecta(img2, i)

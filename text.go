@@ -23,7 +23,7 @@ func (n *Nimbus) Put(c int) {
 	ey -= 10
 
 	// Draw paper under the char
-	img, _ := ebiten.NewImage(8, 10, ebiten.FilterDefault)
+	img := ebiten.NewImage(8, 10, ebiten.FilterDefault)
 	img.Fill(n.convertColour(n.paperColour))
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(ex, ey)
@@ -51,7 +51,7 @@ func (n *Nimbus) Put(c int) {
 		// Copy actual textbox image
 		oldTextBoxImg := n.paper.SubImage(image.Rect(int(x1), int(y1), int(x2), int(y2))).(*ebiten.Image)
 		// Create a new textbox image and fill it with paper colour
-		newTextBoxImg, _ := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
+		newTextBoxImg := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
 		newTextBoxImg.Fill(n.convertColour(n.paperColour))
 		// Place old textbox image on new image 10 pixels higher
 		op = &ebiten.DrawImageOptions{}

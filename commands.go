@@ -14,7 +14,7 @@ func (n *Nimbus) SetMode(columns int) {
 	}
 	if columns == 40 {
 		// low-resolution, high-colour mode (320x250)
-		n.paper, _ = ebiten.NewImage(320, 250, ebiten.FilterDefault)
+		n.paper = ebiten.NewImage(320, 250, ebiten.FilterDefault)
 		n.paperColour = 0
 		n.borderColour = 0
 		n.penColour = 15
@@ -22,7 +22,7 @@ func (n *Nimbus) SetMode(columns int) {
 	}
 	if columns == 80 {
 		// high-resolutions, low-colour mode (640x250)
-		n.paper, _ = ebiten.NewImage(640, 250, ebiten.FilterDefault)
+		n.paper = ebiten.NewImage(640, 250, ebiten.FilterDefault)
 		n.palette = n.defaultHighResPalette
 		n.paperColour = 0
 		n.borderColour = 0
@@ -131,7 +131,7 @@ func (n *Nimbus) Cls(p ...int) {
 	y2 += 10
 	// Create temp image and fill it with paper colour, then paste on the
 	// paper
-	img, _ := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
+	img := ebiten.NewImage(int(x2-x1), int(y2-y1), ebiten.FilterDefault)
 	img.Fill(n.convertColour(n.paperColour))
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(x1, y1)
