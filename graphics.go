@@ -48,7 +48,7 @@ func (n *Nimbus) Plot(opt PlotOptions, text string, x, y int) {
 	n.validateColour(opt.Brush)
 	// Create a new image big enough to contain the plotted chars
 	// (without scaling)
-	img := ebiten.NewImage(len(text)*10, 10, ebiten.FilterDefault)
+	img := ebiten.NewImage(len(text)*10, 10)
 	// draw chars on the image
 	xpos := 0
 	for _, c := range text {
@@ -323,7 +323,7 @@ func (n *Nimbus) drawLine(x1, y1, x2, y2, colour int) {
 	dest := image.NewRGBA(image.Rect(0, 0, paperWidth, paperHeight))
 	bresenham.Bresenham(dest, int(ex1), int(ey1), int(ex2), int(ey2), n.convertColour(colour))
 	// create a copy of the image as an ebiten.image and paste it on to the Nimbus paper
-	img := ebiten.NewImageFromImage(dest, ebiten.FilterDefault)
+	img := ebiten.NewImageFromImage(dest)
 	op := &ebiten.DrawImageOptions{}
 	n.paper.DrawImage(img, op)
 }
@@ -358,7 +358,7 @@ func (n *Nimbus) getClosestNimbusColour(c color.RGBA) color.RGBA {
 // on current screen mode, and assigns it to a Nimbus image block
 func (n *Nimbus) Fetch(img *ebiten.Image, b int) {
 	width, height := img.Size()
-	newImg := ebiten.NewImage(width, height, ebiten.FilterDefault)
+	newImg := ebiten.NewImage(width, height)
 	nearestColours := make(map[color.RGBA]color.RGBA)
 	// First pass - for each pixel try to add RGBA as key to map
 	for y := 0; y < height; y++ {
