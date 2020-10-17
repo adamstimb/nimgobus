@@ -328,52 +328,23 @@ func (n *Nimbus) drawLine(x1, y1, x2, y2, colour int) {
 	n.paper.DrawImage(img, op)
 }
 
-// distance returns the distance between 2 RGBA colours
-func distance(c1, c2 color.RGBA) float64 {
-	return math.Sqrt(
-		math.Pow((float64(c1.R)-float64(c2.R)), 2) +
-			math.Pow((float64(c1.G)-float64(c2.G)), 2) +
-			math.Pow((float64(c1.B)-float64(c2.B)), 2))
-}
-
-// getClosestNimbusColour receives any RGBA and returns the nearest Nimbus RGBA for
-// the current screen mode
-func (n *Nimbus) getClosestNimbusColour(c color.RGBA) color.RGBA {
-	// find Nimbus colour with lowest score
-	score := 1000.0
-	closestColor := color.RGBA{0, 0, 0, 255}
-	for col := range n.palette {
-		// Calculate score for this colour. If it's lower then
-		// update score & closestColor, otherwise go to next
-		tempScore := distance(c, n.convertColour(col))
-		if tempScore < score {
-			score = tempScore
-			closestColor = n.convertColour(col)
-		}
-	}
-	return closestColor
-}
-
 // Fetch receives an image, downsamples the number of colours to 4 or 16 depending
 // on current screen mode, and assigns it to a Nimbus image block
 func (n *Nimbus) Fetch(img *ebiten.Image, b int) {
 	width, height := img.Size()
 	newImg := ebiten.NewImage(width, height)
-	nearestColours := make(map[color.RGBA]color.RGBA)
-	// First pass - for each pixel try to add RGBA as key to map
+
+	// Make a temp pallete of the current screen colours
+	rgbaColours := make([]color.Color, len(n.palette))
+	for i := 0; i < len(n.palette); i++ {
+		rgbaColours[i] = n.convertColour(i)
+	}
+	tempPalette := color.Palette(rgbaColours)
+
+	// Replace the colour of each pixel in the image with the nearest Nimbus colour
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			nearestColours[img.At(x, y).(color.RGBA)] = img.At(x, y).(color.RGBA)
-		}
-	}
-	// For each key in map, set the value to nearest Nimbus colour
-	for key := range nearestColours {
-		nearestColours[key] = n.getClosestNimbusColour(key)
-	}
-	// 2nd pass - for replace each pixel with nearest Nimbus colour
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			newImg.Set(x, y, nearestColours[img.At(x, y).(color.RGBA)])
+			newImg.Set(x, y, tempPalette.Convert(img.At(x, y)))
 		}
 	}
 	// Store the image block
