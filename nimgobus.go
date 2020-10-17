@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"log"
 	"math"
+	"math/rand"
 	"time"
 
 	"github.com/adamstimb/nimgobus/images"
@@ -56,6 +57,9 @@ type Nimbus struct {
 // Init initializes a new Nimbus.  You must call this method after declaring a
 // new Nimbus variable.
 func (n *Nimbus) Init() {
+	// in case any randomonia is required we can run a seed on startup
+	rand.Seed(time.Now().UnixNano())
+
 	// Load Nimbus logo image and both charsets
 	n.loadLogoImage()
 	n.loadCharsetImages(0)
