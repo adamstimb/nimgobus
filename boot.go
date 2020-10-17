@@ -11,7 +11,6 @@ import (
 
 // randDelay delays for a random number of milliseconds within limits
 func randDelay(min, max int) {
-	rand.Seed(time.Now().UnixNano())
 	delay := time.Duration(rand.Intn(max-min)+min) * time.Millisecond
 	time.Sleep(delay)
 }
