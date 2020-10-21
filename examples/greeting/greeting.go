@@ -8,34 +8,32 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
-const (
-	screenWidth  = 1400
-	screenHeight = 1000
-)
-
 type Game struct {
-	count int
-	nimgobus.Nimbus
-}
-
-func (g *Game) Update() error {
-	if g.count == 0 {
-		go Test(g)
-	}
-	g.count++
-	g.Nimbus.Update()
-	return nil
+	count           int
+	nimgobus.Nimbus // Embed the Nimbus in the Game struct
 }
 
 func NewGame() *Game {
 	game := &Game{}
-
-	game.Init()
-
+	game.Init() // Initialize Nimgobus
 	return game
 }
 
-func Test(g *Game) {
+func (g *Game) Update() error {
+	if g.count == 0 {
+		go App(g) // Launch the Nimbus app on first iteration
+	}
+	g.count++
+	g.Nimbus.Update() // Update the app on all subsequent iterations
+	return nil
+}
+
+func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+	return outsideWidth, outsideHeight
+}
+
+func App(g *Game) {
+	// This is the Nimbus app itself
 	g.Boot()       // Boot the Nimbus! (this is optional)
 	g.SetMode(40)  // Low-res, high-colour mode
 	g.SetBorder(9) // Light blue border
@@ -56,25 +54,29 @@ func Test(g *Game) {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-
 	// Draw the Nimbus monitor on the screen and scale to current window size.
 	monitorWidth, monitorHeight := g.Monitor.Size()
+
+	// Get ebiten window size so we can scale the Nimbus screen up or down
+	// but if (0, 0) is returned we're not running on a desktop so don't do any scaling
+	windowWidth, windowHeight := ebiten.WindowSize()
+
 	// Calculate aspect ratios of Nimbus monitor and ebiten screen
 	monitorRatio := float64(monitorWidth) / float64(monitorHeight)
-	screenRatio := float64(screenWidth) / float64(screenHeight)
+	windowRatio := float64(windowWidth) / float64(windowHeight)
 
-	// If screenRatio > monitorRatio then clamp monitorHeight to screenHeight otherwise
+	// If windowRatio > monitorRatio then clamp monitorHeight to windowHeight otherwise
 	// clamp monitorWidth to screenWidth
 	var scale, offsetX, offsetY float64
-	if screenRatio > monitorRatio {
-		scale = float64(screenHeight) / float64(monitorHeight)
-		offsetX = (float64(screenWidth) - float64(monitorWidth)*scale) / 2
+	switch {
+	case windowRatio > monitorRatio:
+		scale = float64(windowHeight) / float64(monitorHeight)
+		offsetX = (float64(windowWidth) - float64(monitorWidth)*scale) / 2
 		offsetY = 0
-	}
-	if screenRatio <= monitorRatio {
-		scale = float64(screenWidth) / float64(monitorWidth)
+	case windowRatio <= monitorRatio:
+		scale = float64(windowWidth) / float64(monitorWidth)
 		offsetX = 0
-		offsetY = (float64(screenHeight) - float64(monitorHeight)*scale) / 2
+		offsetY = (float64(windowHeight) - float64(monitorHeight)*scale) / 2
 	}
 
 	// Apply scale and centre monitor on screen
@@ -85,19 +87,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(g.Monitor, op)
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return outsideWidth, outsideHeight
-}
-
 func main() {
+	// Set up resizeable window
+	ebiten.SetWindowSize(1400, 1000)
+	ebiten.SetWindowTitle("Nimgobus")
+	ebiten.SetWindowResizable(true)
 
-	// set up window
-	ebiten.SetWindowSize(screenWidth, screenHeight)
-	ebiten.SetWindowTitle("Nimgobus Test")
-
+	// Create a new game and pass it to RunGame method
 	game := NewGame()
-
-	// Call RunGame method, passing the address of the pointer to an empty Game struct
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}

@@ -14,45 +14,49 @@ Nimgobus is an extension of the excellent [Ebiten](https://ebiten.org/) game eng
 
 ## Usage
 
-Nimgobus generates a screen image that can be embedded in an Ebiten application.  First declare a global variable of type Nimbus:
+Nimgobus generates a screen image that can be embedded in an Ebiten application.  First add Nimgobus to your Game struct:
 
 ```go
-var (
-	nim nimgobus.Nimbus
-)
+type Game struct {
+	count           int
+	// ...
+	nimgobus.Nimbus // Embed the Nimbus in the Game struct
+}
 ```
 
-In your `main()` function, initialize the Nimbus before sending any commands to it:
+In your `NewGame()` function, initialize the Nimbus before sending any commands to it:
 
 ```go
-func main() {
-	//...
-	nim.Init()
-	//...
+func NewGame() *Game {
+	game := &Game{}
+	// ...
+	game.Init() // Initialize Nimgobus
+	return game
 }
 ```
 
 In the `Update()` function add a call to update the Nimbus monitor screen:
 
 ```go
-func (g *Game) Update(screen *ebiten.Image) error {
-	//...
-	nim.Update()
-	//...
+func (g *Game) Update() error {
+	// ...
+	g.Nimbus.Update() // Update the app on all subsequent iterations
+	// ...
+	return nil
 }
 ```
 
 The Nimbus screen can be retrieved like this:
 
 ```go
-img := nim.Monitor
+img := g.Monitor
 ```
 
 And commands sent like this:
 
 ```go
-nim.Cls()
-nim.Print("Even a stopped clock gives the right time twice a day.")
+g.Cls()
+g.Print("Even a stopped clock gives the right time twice a day.")
 ```
 
 See the [examples](#Examples) below for working examples to get you started.
