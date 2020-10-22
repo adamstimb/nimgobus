@@ -1,4 +1,4 @@
-# ![nimgobus](nimgobus.png)
+# ![nimgobus](nimgobusBanner.png)
 
 An RM Nimbus-inspired [Ebiten](https://ebiten.org/) extension for building retro apps and games in Go.
 
