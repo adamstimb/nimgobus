@@ -52,6 +52,7 @@ type Nimbus struct {
 	cursorFlash           bool
 	charImages0           [256]*ebiten.Image
 	charImages1           [256]*ebiten.Image
+	keyPress              int
 }
 
 // Init initializes a new Nimbus.  You must call this method after declaring a
@@ -82,12 +83,15 @@ func (n *Nimbus) Init() {
 	n.cursorPosition = colRow{1, 1}
 	n.cursorFlash = false
 	n.selectedTextBox = 0
+	n.keyPress = -1
+
 	// Initialize with mode 80 textboxes
 	for i := 0; i < 10; i++ {
 		n.textBoxes[i] = textBox{1, 1, 25, 80}
 	}
 	// Start flashCursor
 	go n.flashCursor()
+	//go n.updateKeyPress()
 }
 
 // flashCursor flips the cursorFlash flag every half second
@@ -109,11 +113,46 @@ func (n *Nimbus) flashCursor() {
 	}
 }
 
+// updateKeys scans the keyboard and updates the Nimbus's keyPress state
+func (n *Nimbus) updateKeyPress() {
+	//for {
+	// evaluate control keys that can be used for terminal input
+	// for any advanced usage you should use ebiten's API directly
+	if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
+		n.keyPress = -10
+		//continue
+		return
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeyKPEnter) {
+		n.keyPress = -11
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		n.keyPress = -12
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		n.keyPress = -13
+	}
+	// evaluate printable chars and return if any
+	keyChars := ebiten.InputChars()
+	if len(keyChars) > 0 {
+		n.keyPress = int(keyChars[0])
+	} else {
+		n.keyPress = -1
+	}
+	//}
+}
+
 // Update redraws the Nimbus monitor image
 func (n *Nimbus) Update() {
 
+	n.updateKeyPress()
+
 	// Copy paper so we can apply overlays (e.g. cursor)
-	paperCopy := ebiten.NewImageFromImage(n.paper)
+	//paperCopy := ebiten.NewImageFromImage(tempPaper)	// <---- Seems to break on Windows...
+	//...therefore we create a new image and paste the current paper on that
+	paperCopy := ebiten.NewImage(n.paper.Size())
+	op := &ebiten.DrawImageOptions{}
+	paperCopy.DrawImage(n.paper, op)
 
 	// Apply overlays
 	// Cursor
@@ -126,7 +165,7 @@ func (n *Nimbus) Update() {
 	paperX, paperY := paperCopy.Size()
 	scaleX := 640.0 / float64(paperX)
 	scaleY := 500.0 / float64(paperY)
-	op := &ebiten.DrawImageOptions{}
+	op = &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(scaleX, scaleY)
 	scaledPaper := ebiten.NewImage(640, 500)
 	scaledPaper.DrawImage(paperCopy, op)
@@ -141,6 +180,7 @@ func (n *Nimbus) Update() {
 	// Draw paper with border on monitor
 	op = &ebiten.DrawImageOptions{}
 	n.Monitor.DrawImage(withBorder, op)
+
 }
 
 // loadLogoImage loads the Nimbus logo image
