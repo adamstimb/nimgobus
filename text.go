@@ -2,7 +2,6 @@ package nimgobus
 
 import (
 	"image"
-	"time"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -90,7 +89,8 @@ func (n *Nimbus) Print(text string) {
 // Get returns a single character code input from the keyboard.
 // If no key was pressed then -1 is returned.
 func (n *Nimbus) Get() int {
-	return n.keyPress
+	return n.popKeyBuffer()
+	//return n.keyPress
 }
 
 // Input receives keyboard input into a string of up to 256 chars and returns
@@ -195,96 +195,77 @@ func (n *Nimbus) Input(prompt string) string {
 	}
 
 	// now loop to received and edit the input string until enter is pressed
-	lastChar := -1
-	repeatCount := 0
-	sleepTime := 5 * time.Millisecond
 	for {
 		// get most recent keyboard input
 		char := n.Get()
 		if char == -1 {
-			// nothing pressed so update vars and skip
-			lastChar = char
-			repeatCount = 0
+			// nothing pressed so update vars an skip
 			continue
 		}
-		if char != -1 && bufferPosition <= 256 {
-			// repeating char
-			if char == lastChar && repeatCount < 20 {
-				// let use hold key down for several frames to prevent
-				// spewing the same letter
-				repeatCount++
-				time.Sleep(sleepTime) // fine tuning required!
-				continue
-			} else {
-				// this key has been held down long enough to be repeated
-				repeatCount = 0
+		// handle control keys if any
+		if char <= -10 {
+			// is control key
+			if char == -11 {
+				// ENTER pressed so echo buffer beyong current position
+				// one last time and break loop
+				echoBuffer(buffer, bufferPosition)
+				break
 			}
-			// handle control keys if any
-			if char <= -10 {
-				// is control key
-				if char == -11 {
-					// ENTER pressed so echo buffer beyong current position
-					// one last time and break loop
-					echoBuffer(buffer, bufferPosition)
-					time.Sleep(10 * time.Millisecond)
-					break
-				}
-				if char == -10 {
-					// BACKSPACE pressed
-					if bufferPosition > 0 {
-						// only delete if not at beginning
-						bufferPosition--
-						buffer = popBuffer(buffer, bufferPosition)
-						// delete char on screen
-						moveCursorBack(true)
-						// if deleting from before the end of the buffer, rewrite
-						// the rest of the buffer and delete the trailing char
-						if bufferPosition < len(buffer) {
-							tempCursorPosition := n.cursorPosition
-							echoBuffer(buffer, bufferPosition)
-							n.Put(32)
-							n.cursorPosition = tempCursorPosition
-						}
-					}
-				}
-				if char == -12 {
-					// LEFT ARROW pressed
-					if bufferPosition > 1 {
-						// only move left if not at beginning
-						bufferPosition--
-						moveCursorBack(false)
-					}
-				}
-				if char == -13 {
-					// RIGHT ARROW pressed
-					if bufferPosition < len(buffer) {
-						// only move right if not at end of buffer
-						bufferPosition++
-						moveCursorForward()
-					}
-				}
-			} else {
-				// is printable char
-				// only accept it if we have space
-				if bufferPosition <= maxBufferSize {
-					// push new char into buffer
-					buffer = pushBuffer(buffer, bufferPosition, char)
-					// if new char added before end of buffer, rewrite rest of buffer
-					// otherwise simply put the last char in the buffer
+			if char == -10 {
+				// BACKSPACE pressed
+				if bufferPosition > 0 {
+					// only delete if not at beginning
+					bufferPosition--
+					buffer = popBuffer(buffer, bufferPosition)
+					// delete char on screen
+					moveCursorBack(true)
+					// if deleting from before the end of the buffer, rewrite
+					// the rest of the buffer and delete the trailing char
 					if bufferPosition < len(buffer) {
 						tempCursorPosition := n.cursorPosition
 						echoBuffer(buffer, bufferPosition)
+						n.Put(32)
 						n.cursorPosition = tempCursorPosition
-						moveCursorForward()
-					} else {
-						n.Put(buffer[len(buffer)-1])
 					}
-					bufferPosition++
 				}
 			}
-			lastChar = char
+			if char == -12 {
+				// LEFT ARROW pressed
+				if bufferPosition > 1 {
+					// only move left if not at beginning
+					bufferPosition--
+					moveCursorBack(false)
+				}
+			}
+			if char == -13 {
+				// RIGHT ARROW pressed
+				if bufferPosition < len(buffer) {
+					// only move right if not at end of buffer
+					bufferPosition++
+					moveCursorForward()
+				}
+			}
+		} else {
+			// is printable char
+			// only accept it if we have space
+			if bufferPosition <= maxBufferSize {
+				// push new char into buffer
+				buffer = pushBuffer(buffer, bufferPosition, char)
+				// if new char added before end of buffer, rewrite rest of buffer
+				// otherwise simply put the last char in the buffer
+				if bufferPosition < len(buffer) {
+					tempCursorPosition := n.cursorPosition
+					echoBuffer(buffer, bufferPosition)
+					n.cursorPosition = tempCursorPosition
+					moveCursorForward()
+				} else {
+					n.Put(buffer[len(buffer)-1])
+				}
+				bufferPosition++
+			}
 		}
 	}
+
 	// Enter was pressed so carriage return
 	n.Put(13)
 	// Put inputBuffer into a string
