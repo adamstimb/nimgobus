@@ -268,6 +268,7 @@ func (n *Nimbus) Input(prompt string) string {
 
 	// Enter was pressed so carriage return
 	n.Put(13)
+	_ = n.popKeyBuffer()
 	// Put inputBuffer into a string
 	var returnString string
 	for _, c := range buffer {

@@ -52,9 +52,10 @@ type Nimbus struct {
 	cursorFlash           bool
 	charImages0           [256]*ebiten.Image
 	charImages1           [256]*ebiten.Image
-	keyPress              int
 	keyBuffer             []int
 	keyBufferLock         bool
+	ebitenInputChars      []rune
+	ebitenInputCharsLock  bool
 }
 
 // Init initializes a new Nimbus.  You must call this method after declaring a
@@ -85,9 +86,10 @@ func (n *Nimbus) Init() {
 	n.cursorPosition = colRow{1, 1}
 	n.cursorFlash = false
 	n.selectedTextBox = 0
-	n.keyPress = -1
 	n.keyBuffer = []int{}
 	n.keyBufferLock = false
+	n.ebitenInputChars = []rune{}
+	n.ebitenInputCharsLock = true
 
 	// Initialize with mode 80 textboxes
 	for i := 0; i < 10; i++ {
@@ -97,7 +99,6 @@ func (n *Nimbus) Init() {
 	go n.flashCursor()
 	// Start keyboardMonitor
 	go n.keyboardMonitor()
-	//go n.updateKeyPress()
 }
 
 // flashCursor flips the cursorFlash flag every half second
@@ -130,8 +131,6 @@ func (n *Nimbus) pushKeyBuffer(char int) {
 	n.keyBuffer = append(n.keyBuffer, char)
 	// all done release lock
 	n.keyBufferLock = false
-	print("pushKeyBuffer len keyBuffer=")
-	print(len(n.keyBuffer))
 }
 
 // popKeyBuffer obtains keyBufferLock then pops the oldest char in the buffer
@@ -150,98 +149,86 @@ func (n *Nimbus) popKeyBuffer() int {
 	n.keyBufferLock = true
 	char := n.keyBuffer[0]
 	// if buffer only has one char re-initialize it otherwise shorten it by 1 element
-	if len(n.keyBuffer) == 1 {
+	if len(n.keyBuffer) <= 1 {
 		n.keyBuffer = []int{}
 	} else {
 		n.keyBuffer = n.keyBuffer[1:]
 	}
 	// all done release lock and return char
 	n.keyBufferLock = false
-	print("popKeyBuffer len keyBuffer=")
-	print(len(n.keyBuffer))
 	return char
 }
 
 // keyboardMonitor checks for key presses, handles repeating keys and adds to keyBuffer
 func (n *Nimbus) keyboardMonitor() {
+
+	handleRepeatingChars := func(keyChars []rune, lastChar int, repeatCount int) (int, int) {
+		sleepTime := 1 * time.Millisecond
+		repeatThreshold := 30
+		for _, thisRune := range keyChars {
+			char := int(thisRune)
+			if char == lastChar && repeatCount < repeatThreshold {
+				// Is repeating char
+				// let use hold key down for several frames to prevent
+				// spewing the same letter
+				repeatCount++
+				lastChar = char
+				time.Sleep(sleepTime)
+				continue
+			} else {
+				// Key has been held down long enough to be repeated or
+				// it's not a repeating key so push it to buffer
+				repeatCount = 0
+				n.pushKeyBuffer(char)
+				lastChar = char
+			}
+		}
+		return lastChar, repeatCount
+	}
+
 	lastChar := -1
 	repeatCount := 0
-	repeatThreshold := 30
-	sleepTime := 1 * time.Millisecond
-	char := 0
 	for {
-		// delay?
-		time.Sleep(10 * time.Millisecond)
 		// evaluate printable chars
-		keyChars := ebiten.InputChars()
+		for !n.ebitenInputCharsLock {
+			// wait for unlock
+		}
+		keyChars := n.ebitenInputChars
+		n.ebitenInputCharsLock = false
 		if len(keyChars) > 0 {
-			// got printable char
-			char = int(keyChars[0])
-			if len(keyChars) > 1 {
-				print("keyChars has length ")
-				println(len(keyChars)) // so evaluate the keys in a function and iterate
-			}
+			lastChar, repeatCount = handleRepeatingChars(keyChars, lastChar, repeatCount)
 		} else {
 			// no printable char so evaluate control keys
-			// ...
+			if ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeyKPEnter) {
+				lastChar, repeatCount = handleRepeatingChars([]rune{-11}, lastChar, repeatCount)
+				continue
+			}
+			if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
+				lastChar, repeatCount = handleRepeatingChars([]rune{-10}, lastChar, repeatCount)
+				continue
+			}
+			if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+				lastChar, repeatCount = handleRepeatingChars([]rune{-12}, lastChar, repeatCount)
+				continue
+			}
+			if ebiten.IsKeyPressed(ebiten.KeyRight) {
+				lastChar, repeatCount = handleRepeatingChars([]rune{-13}, lastChar, repeatCount)
+				continue
+			}
 			// if not control chars then next iteration
 			repeatCount = 0
 			lastChar = -1
 			continue
 		}
-		// got char or control key so handle repeating key
-		if char == lastChar && repeatCount < repeatThreshold {
-			// Is repeating char
-			// let use hold key down for several frames to prevent
-			// spewing the same letter
-			repeatCount++
-			//print(repeatCount)
-			lastChar = char
-			time.Sleep(sleepTime)
-			continue
-		} else {
-			// Key has been held down long enough to be repeated or
-			// it's not a repeating key so push it to buffer
-			repeatCount = 0
-			n.pushKeyBuffer(char)
-			lastChar = char
-		}
 	}
-}
-
-// updateKeys scans the keyboard and updates the Nimbus's keyPress state (DELETE)
-func (n *Nimbus) updateKeyPress() {
-	//for {
-	// evaluate control keys that can be used for terminal input
-	// for any advanced usage you should use ebiten's API directly
-	if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
-		n.keyPress = -10
-		//continue
-		return
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeyKPEnter) {
-		n.keyPress = -11
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		n.keyPress = -12
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		n.keyPress = -13
-	}
-	// evaluate printable chars and return if any
-	keyChars := ebiten.InputChars()
-	if len(keyChars) > 0 {
-		n.keyPress = int(keyChars[0])
-	} else {
-		n.keyPress = -1
-	}
-	//}
 }
 
 // Update redraws the Nimbus monitor image
 func (n *Nimbus) Update() {
 
-	//n.updateKeyPress()
+	// Update input chars
+	n.ebitenInputCharsLock = true
+	n.ebitenInputChars = ebiten.InputChars()
 
 	// Copy paper so we can apply overlays (e.g. cursor)
 	//paperCopy := ebiten.NewImageFromImage(tempPaper)	// <---- Seems to break on Windows...
