@@ -244,6 +244,11 @@ func (n *Nimbus) Update() {
 		n.drawChar(paperCopy, n.cursorChar, int(curX), int(curY), n.penColour, n.cursorCharset)
 	}
 
+	if paperCopy == n.paper {
+		// paper has not changed so don't redraw screen
+		return
+	}
+
 	// calculate y scale for paper and apply scaling
 	paperX, paperY := paperCopy.Size()
 	scaleX := 640.0 / float64(paperX)
