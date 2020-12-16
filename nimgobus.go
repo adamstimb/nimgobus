@@ -253,22 +253,17 @@ func (n *Nimbus) Update() {
 		n.drawChar(paperCopy, n.cursorChar, int(curX), int(curY), n.penColour, n.cursorCharset)
 	}
 
-	// calculate y scale for paper
+	// calculate y scale for paper and draw it on border image
 	paperX, paperY := paperCopy.Size()
 	scaleX := 640.0 / float64(paperX)
 	scaleY := 500.0 / float64(paperY)
 	op = &ebiten.DrawImageOptions{}
-	// Add the border around the paper and apply scaling
-	//withBorder := ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2))
-	//withBorder.Fill(n.convertColour(n.borderColour)) // Apply border colour
 	op.GeoM.Scale(scaleX, scaleY)
 	op.GeoM.Translate(float64(n.borderSize), float64(n.borderSize))
-	//withBorder.DrawImage(paperCopy, op)
 	n.borderImage.DrawImage(paperCopy, op)
 
-	// Draw paper with border on monitor
+	// Draw border image on monitor
 	op = &ebiten.DrawImageOptions{}
-	//n.Monitor.DrawImage(withBorder, op)
 	n.Monitor.DrawImage(n.borderImage, op)
 }
 
