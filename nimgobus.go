@@ -31,6 +31,7 @@ type textBox struct {
 // only need to call the Init() method after declaring a new Nimbus.
 type Nimbus struct {
 	Monitor               *ebiten.Image
+	borderImage           *ebiten.Image
 	paper                 *ebiten.Image
 	basicColours          []color.RGBA
 	borderSize            int
@@ -64,12 +65,16 @@ func (n *Nimbus) Init() {
 	// in case any randomonia is required we can run a seed on startup
 	rand.Seed(time.Now().UnixNano())
 
+	// should next exceed 60tps
+	ebiten.SetMaxTPS(60)
+
 	// Load Nimbus logo image and both charsets
 	n.loadLogoImage()
 	n.loadCharsetImages(0)
 	n.loadCharsetImages(1)
 	// Set init values of everything else
 	n.borderSize = 50
+	n.borderImage = ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2))
 	n.Monitor = ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2))
 	n.paper = ebiten.NewImage(640, 250)
 	n.basicColours = basicColours
@@ -163,8 +168,8 @@ func (n *Nimbus) popKeyBuffer() int {
 func (n *Nimbus) keyboardMonitor() {
 
 	handleRepeatingChars := func(keyChars []rune, lastChar int, repeatCount int) (int, int) {
-		sleepTime := 1 * time.Millisecond
-		repeatThreshold := 30
+		sleepTime := 10 * time.Microsecond
+		repeatThreshold := 5
 		for _, thisRune := range keyChars {
 			char := int(thisRune)
 			if char == lastChar && repeatCount < repeatThreshold {
@@ -223,15 +228,19 @@ func (n *Nimbus) keyboardMonitor() {
 	}
 }
 
+func updateInputChars(n *Nimbus) {
+	n.ebitenInputCharsLock = true
+	n.ebitenInputChars = ebiten.InputChars()
+}
+
 // Update redraws the Nimbus monitor image
 func (n *Nimbus) Update() {
 
 	// Update input chars
-	n.ebitenInputCharsLock = true
-	n.ebitenInputChars = ebiten.InputChars()
+	go updateInputChars(n)
 
 	// Copy paper so we can apply overlays (e.g. cursor)
-	//paperCopy := ebiten.NewImageFromImage(tempPaper)	// <---- Seems to break on Windows...
+	//paperCopy := ebiten.NewImageFromImage(n.paper) // <---- Seems to break on Windows and is slow on Linux
 	//...therefore we create a new image and paste the current paper on that
 	paperCopy := ebiten.NewImage(n.paper.Size())
 	op := &ebiten.DrawImageOptions{}
@@ -244,31 +253,23 @@ func (n *Nimbus) Update() {
 		n.drawChar(paperCopy, n.cursorChar, int(curX), int(curY), n.penColour, n.cursorCharset)
 	}
 
-	if paperCopy == n.paper {
-		// paper has not changed so don't redraw screen
-		return
-	}
-
-	// calculate y scale for paper and apply scaling
+	// calculate y scale for paper
 	paperX, paperY := paperCopy.Size()
 	scaleX := 640.0 / float64(paperX)
 	scaleY := 500.0 / float64(paperY)
 	op = &ebiten.DrawImageOptions{}
+	// Add the border around the paper and apply scaling
+	//withBorder := ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2))
+	//withBorder.Fill(n.convertColour(n.borderColour)) // Apply border colour
 	op.GeoM.Scale(scaleX, scaleY)
-	scaledPaper := ebiten.NewImage(640, 500)
-	scaledPaper.DrawImage(paperCopy, op)
-
-	// Add the border around the paper
-	withBorder := ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2))
-	withBorder.Fill(n.convertColour(n.borderColour)) // Apply border colour
-	op = &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(n.borderSize), float64(n.borderSize))
-	withBorder.DrawImage(scaledPaper, op)
+	//withBorder.DrawImage(paperCopy, op)
+	n.borderImage.DrawImage(paperCopy, op)
 
 	// Draw paper with border on monitor
 	op = &ebiten.DrawImageOptions{}
-	n.Monitor.DrawImage(withBorder, op)
-
+	//n.Monitor.DrawImage(withBorder, op)
+	n.Monitor.DrawImage(n.borderImage, op)
 }
 
 // loadLogoImage loads the Nimbus logo image

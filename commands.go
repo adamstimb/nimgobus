@@ -19,6 +19,9 @@ func (n *Nimbus) SetMode(columns int) {
 		n.borderColour = 0
 		n.penColour = 15
 		n.palette = n.defaultLowResPalette
+		// reinit border image and fill with new colour
+		n.borderImage = ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2))
+		n.borderImage.Fill(n.convertColour(n.borderColour))
 	}
 	if columns == 80 {
 		// high-resolutions, low-colour mode (640x250)
@@ -27,6 +30,9 @@ func (n *Nimbus) SetMode(columns int) {
 		n.paperColour = 0
 		n.borderColour = 0
 		n.penColour = 3
+		// reinit border image and fill with new colour
+		n.borderImage = ebiten.NewImage(640+(n.borderSize*2), 500+(n.borderSize*2))
+		n.borderImage.Fill(n.convertColour(n.borderColour))
 	}
 	n.cursorPosition = colRow{1, 1}              // Relocate cursor
 	n.paper.Fill(n.convertColour(n.paperColour)) // Apply paper colour
