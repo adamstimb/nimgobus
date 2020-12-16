@@ -90,7 +90,6 @@ func (n *Nimbus) Print(text string) {
 // If no key was pressed then -1 is returned.
 func (n *Nimbus) Get() int {
 	return n.popKeyBuffer()
-	//return n.keyPress
 }
 
 // Input receives keyboard input into a string of up to 256 chars and returns

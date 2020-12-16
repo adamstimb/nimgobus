@@ -27,9 +27,18 @@ type textBox struct {
 	row2 int
 }
 
+// StoreItem defines an item in the Nimgobus store, which is a map of StoreItem arrays
+// that acts as a simple RAM.  Values are stored as strings but the original data
+// type is remembered by assigning a code number to valueType.
+type StoreItem struct {
+	valueType int
+	value     string
+}
+
 // Nimbus acts as a container for all the components of the Nimbus monitor.  You
 // only need to call the Init() method after declaring a new Nimbus.
 type Nimbus struct {
+	Store                 map[string][]StoreItem
 	Monitor               *ebiten.Image
 	borderImage           *ebiten.Image
 	paper                 *ebiten.Image
