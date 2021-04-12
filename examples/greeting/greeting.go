@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/adamstimb/nimgobus"
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {

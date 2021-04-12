@@ -14,7 +14,7 @@ import (
 
 	"github.com/adamstimb/nimgobus"
 	"github.com/adamstimb/nimgobus/examples/isstracker/issImages"
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {

@@ -65,7 +65,7 @@ func drawBackground(n *Nimbus) {
 	}
 	host, err := sysinfo.Host()
 	if err != nil {
-		panic("Could detect system information")
+		panic("Could not detect system information")
 	}
 	firmwareVersion = fmt.Sprintf("Firmware version: %s", firmwareVersion)
 	serialNumber := "Serial number:  21/06809" // In honour of whichever physical machine donate its ROM to MAME

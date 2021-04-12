@@ -8,8 +8,8 @@ import (
 	"sort"
 
 	"github.com/StephaneBunel/bresenham"
-	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/vector"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 // PlonkLogo draws the RM Nimbus logo
