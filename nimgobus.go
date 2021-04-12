@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/adamstimb/nimgobus/images"
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // colRow defines a column, row position

@@ -1,7 +1,7 @@
 package nimgobus
 
 import (
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // SetMode sets the screen mode. 40 is low-resolution, high-colour mode (320x250) and

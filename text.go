@@ -3,7 +3,7 @@ package nimgobus
 import (
 	"image"
 
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // Put draws an ASCII char at the cursor position
