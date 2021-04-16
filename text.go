@@ -96,12 +96,21 @@ func (n *Nimbus) Get() int {
 // the string when ENTER is pressed.
 // The user can edit the string using the delete key and left and right arrow
 // keys.  A prompt is printed on the screen at the current cursor position and
-// the user's input is echoed to screen after the prompt.
-func (n *Nimbus) Input(prompt string) string {
+// the user's input is echoed to screen after the prompt.  The input buffer can
+// also be pre-populated.
+func (n *Nimbus) Input(prompt string, prepopulateBuffer string) string {
+	// Print the prompt message without carriage return
+	for _, c := range prompt {
+		n.Put(int(c))
+	}
 
-	// Initialize buffer
+	// Initialize buffer and print it
 	var buffer []int
-	bufferPosition := 0
+	for _, c := range prepopulateBuffer {
+		n.Put(int(c))
+		buffer = append(buffer, int(c))
+	}
+	bufferPosition := len(buffer)
 	maxBufferSize := 255
 
 	// popBuffer pops a char from the buffer at a given position
@@ -186,11 +195,6 @@ func (n *Nimbus) Input(prompt string) string {
 			n.cursorPosition.col = box.col1
 			n.cursorPosition.row++
 		}
-	}
-
-	// Print the prompt message with carriage return
-	for _, c := range prompt {
-		n.Put(int(c))
 	}
 
 	// now loop to received and edit the input string until enter is pressed
