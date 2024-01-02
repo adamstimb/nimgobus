@@ -7,8 +7,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/adamstimb/nimgobus"
 	"github.com/adamstimb/nimgobus/examples/games/worm/queue"
-	nimgobus "github.com/adamstimb/nimgobus/pkg"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )

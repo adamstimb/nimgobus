@@ -9,20 +9,9 @@ import (
 
 	"github.com/adamstimb/nimgobus/internal/make2darray"
 	"github.com/adamstimb/nimgobus/internal/subbios/colour"
+	"github.com/adamstimb/nimgobus/sprite"
 	"github.com/hajimehoshi/ebiten/v2"
 )
-
-// saveTableRow describes a row in the SaveTable type
-type saveTableRow struct {
-	X int // x position
-	Y int // y position
-	C int // colour
-}
-
-// SaveTable describes a save table used in sprites
-type SaveTable struct {
-	Rows []saveTableRow
-}
 
 // FillStyle describes the fill settings for AREA, FLOOD, CIRCLE, and SLICE
 type fillStyle struct {
@@ -44,7 +33,7 @@ type feature struct {
 	isMoveSprite                bool
 	isDeleteSprite              bool
 	isConsoleText               bool
-	saveTable                   *SaveTable
+	saveTable                   *sprite.SaveTable
 	overrideCurrentClippingArea bool
 	clippingArea                int
 }
@@ -390,7 +379,7 @@ func (v *video) drawFeature(f feature) {
 		clip := v.clippingAreaTable[clippingAreaId]
 		// Lock video memory and scan
 		v.muMemory.Lock()
-		f.saveTable.Rows = []saveTableRow{}
+		f.saveTable.Rows = []sprite.SaveTableRow{}
 		for x := f.x; x < (f.x + len(f.pixels[0])); x++ {
 			for y := 250 - f.y - len(f.pixels); y < 250-f.y; y++ {
 				// Skip any coordinates outside the clipping area
@@ -399,7 +388,7 @@ func (v *video) drawFeature(f feature) {
 					continue
 				}
 				// Populate save table
-				f.saveTable.Rows = append(f.saveTable.Rows, saveTableRow{X: x, Y: y, C: v.memory[y][x]})
+				f.saveTable.Rows = append(f.saveTable.Rows, sprite.SaveTableRow{X: x, Y: y, C: v.memory[y][x]})
 			}
 		}
 		v.muMemory.Unlock()
@@ -435,7 +424,7 @@ func (v *video) writeFeature(f feature) {
 			v.memory[r.Y][r.X] = r.C
 		}
 		// update saveTable
-		f.saveTable.Rows = []saveTableRow{}
+		f.saveTable.Rows = []sprite.SaveTableRow{}
 		for x := f.x; x < (f.x + len(f.pixels[0])); x++ {
 			for y := 250 - f.y - len(f.pixels); y < 250-f.y; y++ {
 				// Skip any coordinates outside the clipping area
@@ -444,7 +433,7 @@ func (v *video) writeFeature(f feature) {
 					continue
 				}
 				// Populate save table
-				f.saveTable.Rows = append(f.saveTable.Rows, saveTableRow{X: x, Y: y, C: v.memory[y][x]})
+				f.saveTable.Rows = append(f.saveTable.Rows, sprite.SaveTableRow{X: x, Y: y, C: v.memory[y][x]})
 			}
 		}
 	}

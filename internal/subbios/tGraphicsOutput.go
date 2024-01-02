@@ -6,6 +6,7 @@ import (
 	"github.com/adamstimb/nimgobus/internal/make2darray"
 	"github.com/adamstimb/nimgobus/internal/subbios/colour"
 	"github.com/adamstimb/nimgobus/internal/subbios/errorcode"
+	"github.com/adamstimb/nimgobus/sprite"
 )
 
 // TGraphicsOutput has all the t_graphics_output functions attached to it.
@@ -706,15 +707,8 @@ func (t *TGraphicsOutput) FPlotCharacterString(orientation, yMagnification, xMag
 	t.v.drawFeature(rotatedFeature)
 }
 
-// Sprite represents (as much as is practical) Nimbus sprite data.
-type Sprite struct {
-	HighResolution bool      // Set to true if the sprite is intended for high-resolution mode.
-	Hotspot        [2]int    // The x, y vector from the bottom-left of the sprite to the hotspot.
-	Poses          [][][]int // The sprite images stored as 2D arrays in individual poses.  Up to 2 poses allowed in low-resolution mode, up to 4 in high-resolution mode.
-}
-
 // FDrawSprite draws a sprite on the screen and stores the overwritten data in an saveTable array.
-func (t *TGraphicsOutput) FDrawSprite(s Sprite, saveTable *SaveTable, x, y, pose int, xor bool, clippingAreaId int) {
+func (t *TGraphicsOutput) FDrawSprite(s sprite.Sprite, saveTable *sprite.SaveTable, x, y, pose int, xor bool, clippingAreaId int) {
 	t.s.FunctionError = errorcode.EOk
 	// Handle not on
 	if !t.On {
@@ -756,7 +750,7 @@ func (t *TGraphicsOutput) FDrawSprite(s Sprite, saveTable *SaveTable, x, y, pose
 // FMoveSprite moves an existing sprite on the screen and stores the overwritten data in an saveTable array.
 // Because of the way saveTable has been implemented, this command does not require the "old x, y" as originally
 // documented.
-func (t *TGraphicsOutput) FMoveSprite(s Sprite, saveTable *SaveTable, x, y, pose int, xor bool, clippingAreaId int) {
+func (t *TGraphicsOutput) FMoveSprite(s sprite.Sprite, saveTable *sprite.SaveTable, x, y, pose int, xor bool, clippingAreaId int) {
 	t.s.FunctionError = errorcode.EOk
 	// Handle not on
 	if !t.On {
@@ -796,7 +790,7 @@ func (t *TGraphicsOutput) FMoveSprite(s Sprite, saveTable *SaveTable, x, y, pose
 
 // FEraseSprite erases a sprite associated with a saveTable.  Unlike in the original implementation, it is only necessary
 // to pass the sprite and saveTable as arguments.
-func (t *TGraphicsOutput) FEraseSprite(saveTable *SaveTable) {
+func (t *TGraphicsOutput) FEraseSprite(saveTable *sprite.SaveTable) {
 	t.s.FunctionError = errorcode.EOk
 	// Handle not on
 	if !t.On {

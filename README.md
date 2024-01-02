@@ -9,7 +9,9 @@ _Nimgobus is a tribute project and is in no way linked to or endorsed by RM plc.
 Nimgobus is an extension of the [Ebiten](https://ebiten.org/) game engine.  It mimicks the unique 16-bit text, graphics and sound drivers of the [RM Nimbus PC186](https://en.wikipedia.org/wiki/RM_Nimbus), found in classrooms all over the UK in the 1980s and early 90s.  With Nimgobus you can develop Go applications that have the beautiful look and feel of classic Nimbus software such as PaintSPA, Ourfacts and Caxton Press.  However, it is _not_ an emulation of the Nimbus itself.  This means you get the best of both worlds:
 
 - Cutting-edge Go computing power, beautifully presented in up to 16 colours
-- Build for Linux, Windows, Mobile and WebASM thanks to Ebiten's cross-platform support
+- Build for Linux, Windows and macOS
+- Mileage may vary on mobile platforms.
+- Unfortunately WebASM cannot be targeted due to its lack of multithreading support. 
 
 ## Usage
 

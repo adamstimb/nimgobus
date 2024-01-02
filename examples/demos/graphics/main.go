@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/adamstimb/nimgobus/internal/subbios"
-	nimgobus "github.com/adamstimb/nimgobus/pkg"
+	"github.com/adamstimb/nimgobus"
+	"github.com/adamstimb/nimgobus/sprite"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -755,14 +755,14 @@ func sprites(g *Game) {
 			{-1, -1, -1, -1, -1, -1, -1},
 		},
 	}
-	sprite := subbios.Sprite{HighResolution: false, Hotspot: [2]int{0, 0}, Poses: poses}
-	st := &subbios.SaveTable{}
+	gull := sprite.Sprite{HighResolution: false, Hotspot: [2]int{0, 0}, Poses: poses}
+	st := &sprite.SaveTable{}
 	x := 125
 	y := 160
 	p := 0
 	goingRight := true
 	goingUp := false
-	g.Subbios.TGraphicsOutput.FDrawSprite(sprite, st, x, y, p, false, 0)
+	g.Subbios.TGraphicsOutput.FDrawSprite(gull, st, x, y, p, false, 0)
 	for {
 		time.Sleep(100 * time.Millisecond)
 		if goingRight {
@@ -775,7 +775,7 @@ func sprites(g *Game) {
 		} else {
 			y--
 		}
-		g.Subbios.TGraphicsOutput.FMoveSprite(sprite, st, x, y, p, false, 0)
+		g.Subbios.TGraphicsOutput.FMoveSprite(gull, st, x, y, p, false, 0)
 		p++
 		if p > 4 {
 			p = 0
