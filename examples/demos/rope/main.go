@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	nimgobus "github.com/adamstimb/nimgobus/pkg"
+	nimgobus "github.com/adamstimb/nimgobus"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
