@@ -3,7 +3,7 @@ package subbios
 import (
 	"testing"
 
-	"github.com/adamstimb/nimgobusdev/internal/subbios/errorcode"
+	"github.com/adamstimb/nimgobus/internal/subbios/errorcode"
 )
 
 func TestFAddTwoReals(t *testing.T) {

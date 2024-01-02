@@ -7,29 +7,29 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/adamstimb/nimgobusdev/examples/games/worm/queue"
-	nimgobusdev "github.com/adamstimb/nimgobusdev/pkg"
+	"github.com/adamstimb/nimgobus/examples/games/worm/queue"
+	nimgobus "github.com/adamstimb/nimgobus/pkg"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Game struct {
-	launch             int
-	nimgobusdev.Nimbus // Embed the Nimbus in the Game struct
-	anyKey             bool
-	key                ebiten.Key
-	direction          int
-	speed              int
-	score              int
-	maxScore           int
-	hitEdge            bool
-	demoMode           bool
-	keyA               bool
-	keyS               bool
-	keyK               bool
-	keyM               bool
-	keyEscape          bool
-	keyD               bool
+	launch          int
+	nimgobus.Nimbus // Embed the Nimbus in the Game struct
+	anyKey          bool
+	key             ebiten.Key
+	direction       int
+	speed           int
+	score           int
+	maxScore        int
+	hitEdge         bool
+	demoMode        bool
+	keyA            bool
+	keyS            bool
+	keyK            bool
+	keyM            bool
+	keyEscape       bool
+	keyD            bool
 }
 
 func NewGame() *Game {

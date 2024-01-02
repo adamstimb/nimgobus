@@ -3,9 +3,9 @@ package subbios
 import (
 	"math"
 
-	"github.com/adamstimb/nimgobusdev/internal/make2darray"
-	"github.com/adamstimb/nimgobusdev/internal/subbios/colour"
-	"github.com/adamstimb/nimgobusdev/internal/subbios/errorcode"
+	"github.com/adamstimb/nimgobus/internal/make2darray"
+	"github.com/adamstimb/nimgobus/internal/subbios/colour"
+	"github.com/adamstimb/nimgobus/internal/subbios/errorcode"
 )
 
 // TGraphicsOutput has all the t_graphics_output functions attached to it.

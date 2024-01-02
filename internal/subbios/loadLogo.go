@@ -5,8 +5,8 @@ import (
 	"image"
 	"log"
 
-	"github.com/adamstimb/nimgobusdev/internal/make2darray"
-	"github.com/adamstimb/nimgobusdev/internal/resources/logo"
+	"github.com/adamstimb/nimgobus/internal/make2darray"
+	"github.com/adamstimb/nimgobus/internal/resources/logo"
 )
 
 // loadLogoImage loads the Nimbus logo image

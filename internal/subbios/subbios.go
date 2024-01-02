@@ -3,8 +3,8 @@
 package subbios
 
 import (
-	"github.com/adamstimb/nimgobusdev/internal/queue"
-	"github.com/adamstimb/nimgobusdev/internal/subbios/errorcode"
+	"github.com/adamstimb/nimgobus/internal/queue"
+	"github.com/adamstimb/nimgobus/internal/subbios/errorcode"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

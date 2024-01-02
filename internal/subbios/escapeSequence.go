@@ -1,7 +1,7 @@
 package subbios
 
 import (
-	"github.com/adamstimb/nimgobusdev/internal/make2darray"
+	"github.com/adamstimb/nimgobus/internal/make2darray"
 )
 
 // All the ANSI-style escape sequences for the console are implemented here.

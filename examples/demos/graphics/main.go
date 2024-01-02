@@ -9,14 +9,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/adamstimb/nimgobusdev/internal/subbios"
-	nimgobusdev "github.com/adamstimb/nimgobusdev/pkg"
+	"github.com/adamstimb/nimgobus/internal/subbios"
+	nimgobus "github.com/adamstimb/nimgobus/pkg"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {
-	launch             int
-	nimgobusdev.Nimbus // Embed the Nimbus in the Game struct
+	launch          int
+	nimgobus.Nimbus // Embed the Nimbus in the Game struct
 }
 
 func NewGame() *Game {

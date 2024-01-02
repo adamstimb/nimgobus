@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/adamstimb/nimgobusdev/internal/make2darray"
+	"github.com/adamstimb/nimgobus/internal/make2darray"
 	"github.com/llgcode/draw2d"
 	"github.com/llgcode/draw2d/draw2dimg"
 )

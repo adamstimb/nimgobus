@@ -5,7 +5,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/adamstimb/nimgobusdev/internal/subbios/errorcode"
+	"github.com/adamstimb/nimgobus/internal/subbios/errorcode"
 )
 
 // THardSums has all the t_hard_maths functions attached to it.

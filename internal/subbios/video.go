@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/adamstimb/nimgobusdev/internal/make2darray"
-	"github.com/adamstimb/nimgobusdev/internal/subbios/colour"
+	"github.com/adamstimb/nimgobus/internal/make2darray"
+	"github.com/adamstimb/nimgobus/internal/subbios/colour"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

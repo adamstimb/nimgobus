@@ -5,8 +5,8 @@ import (
 	"image"
 	"log"
 
-	"github.com/adamstimb/nimgobusdev/internal/make2darray"
-	"github.com/adamstimb/nimgobusdev/internal/resources/font"
+	"github.com/adamstimb/nimgobus/internal/make2darray"
+	"github.com/adamstimb/nimgobus/internal/resources/font"
 )
 
 // charImageSelecta returns the subimage of a char from the charset image for any given ASCII code or charset.

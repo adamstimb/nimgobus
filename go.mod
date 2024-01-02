@@ -1,4 +1,4 @@
-module github.com/adamstimb/nimgobusdev
+module github.com/adamstimb/nimgobus
 
 go 1.19
 

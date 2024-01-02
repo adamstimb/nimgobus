@@ -1,8 +1,8 @@
 // nimgobus contains the Nimbus struct from which all the pretend 16-bit magic stems!
-package nimgobusdev
+package nimgobus
 
 import (
-	"github.com/adamstimb/nimgobusdev/internal/subbios"
+	"github.com/adamstimb/nimgobus/internal/subbios"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

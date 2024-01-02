@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/adamstimb/nimgobusdev/internal/queue"
+	"github.com/adamstimb/nimgobus/internal/queue"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
