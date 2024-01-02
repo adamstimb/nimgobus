@@ -58,8 +58,6 @@ g.Subbios.TGraphicsOutput.FGraphicsOutputColdStart() // Start the graphics syste
 g.Subbios.TGraphicsOutput.FPlotCharacterString(0, 1, 2, 13, 0, "Hello there!", 0, 0) // Say hello
 ```
 
-See the [examples](#Examples) below for working examples to get you started.
-
 ### API
 
 Nimgobus is implemented with an API similar to the original Nimbus SUBBIOS which received function calls to the dedicated Nimbus IO drivers as CPU interrupts, with the parameters stored in various registers.  For the sake of simplicity Nimgobus uses conventional Go function arguments and return values.  Furthermore, the SUBBIOS includes a light implementation of an old-skool stdio C library for sending text data to the screen and receiving keyboard input.
