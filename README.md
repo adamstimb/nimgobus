@@ -62,21 +62,7 @@ See the [examples](#Examples) below for working examples to get you started.
 
 ### API
 
-Nimgobus is implemented with an API similar to the original Nimbus SUBBIOS which received function calls to the dedicated Nimbus IO drivers as CPU interrupts, with the parameters stored in various registers.  For the sake of simplicity Nimgobus uses conventional Go function arguments and return values.  Furthermore, the SUBBIOS includes a light implementation of an old-skool stdio C library for sending text data to the screen and receiving keyboard input.  The API is fully explained here.
-
-## Examples
-
-[greeting.go](examples/greeting/greeting.go)
-
-![greeting](examples/greeting/greeting.gif)
-
-[modes.go](examples/modes/modes.go)
-
-![modes](examples/modes/modes.gif)
-
-[isstracker.go](examples/isstracker/isstracker.go)
-
-![isstracker](examples/isstracker/isstracker.gif)
+Nimgobus is implemented with an API similar to the original Nimbus SUBBIOS which received function calls to the dedicated Nimbus IO drivers as CPU interrupts, with the parameters stored in various registers.  For the sake of simplicity Nimgobus uses conventional Go function arguments and return values.  Furthermore, the SUBBIOS includes a light implementation of an old-skool stdio C library for sending text data to the screen and receiving keyboard input.
 
 ## Acknowledgements
 
